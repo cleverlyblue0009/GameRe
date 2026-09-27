@@ -1,0 +1,208 @@
+{
+  "label_set": "ei",
+  "label_rule": "toxic = intentClass in {E, I}",
+  "n_test": 8973,
+  "threshold": 0.5,
+  "metrics": {
+    "LR": {
+      "accuracy": 0.9320182770533824,
+      "macro_f1": 0.8920242337836222,
+      "weighted_f1": 0.9318864527027404,
+      "roc_auc": 0.9494809041260419,
+      "pr_auc": 0.8860946798291245,
+      "recall_toxic": 0.8220963172804533,
+      "precision_toxic": 0.8305666857469949,
+      "false_positives": 296,
+      "false_negatives": 314,
+      "true_positives": 1451,
+      "true_negatives": 6912,
+      "fpr_non_toxic": 0.041065482796892344,
+      "n_non_toxic": 7208,
+      "n_toxic": 1765
+    },
+    "NB": {
+      "accuracy": 0.9131839964337457,
+      "macro_f1": 0.846187224039268,
+      "weighted_f1": 0.9077649734724227,
+      "roc_auc": 0.9045080536891651,
+      "pr_auc": 0.8207573571422233,
+      "recall_toxic": 0.6436260623229462,
+      "precision_toxic": 0.8833592534992224,
+      "false_positives": 150,
+      "false_negatives": 629,
+      "true_positives": 1136,
+      "true_negatives": 7058,
+      "fpr_non_toxic": 0.020810210876803552,
+      "n_non_toxic": 7208,
+      "n_toxic": 1765
+    },
+    "RF": {
+      "accuracy": 0.9288978045246852,
+      "macro_f1": 0.8873588811770894,
+      "weighted_f1": 0.9288520652073635,
+      "roc_auc": 0.9396806114075327,
+      "pr_auc": 0.8707172642371785,
+      "recall_toxic": 0.8175637393767705,
+      "precision_toxic": 0.8203524729960204,
+      "false_positives": 316,
+      "false_negatives": 322,
+      "true_positives": 1443,
+      "true_negatives": 6892,
+      "fpr_non_toxic": 0.04384017758046615,
+      "n_non_toxic": 7208,
+      "n_toxic": 1765
+    },
+    "DistilBERT": {
+      "accuracy": 0.9459489579850663,
+      "macro_f1": 0.912536148712534,
+      "weighted_f1": 0.9453284171709534,
+      "roc_auc": 0.9676866355607399,
+      "pr_auc": 0.918764876152356,
+      "recall_toxic": 0.8334277620396601,
+      "precision_toxic": 0.885078219013237,
+      "false_positives": 191,
+      "false_negatives": 294,
+      "true_positives": 1471,
+      "true_negatives": 7017,
+      "fpr_non_toxic": 0.026498335183129856,
+      "n_non_toxic": 7208,
+      "n_toxic": 1765
+    }
+  },
+  "bootstrap": {
+    "n_resamples": 1000,
+    "seed": 42,
+    "method": "percentile, paired (shared resample indices)",
+    "per_model": {
+      "LR": {
+        "mean": 0.8919479886839086,
+        "std": 0.004141939031550068,
+        "ci_low": 0.8837078102707878,
+        "ci_high": 0.9001550530600835,
+        "n_resamples": 1000,
+        "n_degenerate_skipped": 0
+      },
+      "NB": {
+        "mean": 0.8462862757593825,
+        "std": 0.00510895372323619,
+        "ci_low": 0.8360167951578058,
+        "ci_high": 0.8559807037619893,
+        "n_resamples": 1000,
+        "n_degenerate_skipped": 0
+      },
+      "RF": {
+        "mean": 0.8872746241835866,
+        "std": 0.004217343413103838,
+        "ci_low": 0.8782521271907799,
+        "ci_high": 0.8954476217536047,
+        "n_resamples": 1000,
+        "n_degenerate_skipped": 0
+      },
+      "DistilBERT": {
+        "mean": 0.9124880365206619,
+        "std": 0.003902086493425757,
+        "ci_low": 0.9043965640424148,
+        "ci_high": 0.9202017448076578,
+        "n_resamples": 1000,
+        "n_degenerate_skipped": 0
+      }
+    }
+  },
+  "mcnemar": {
+    "rule": "exact binomial if discordant < 25 else chi-square with continuity correction",
+    "library": "statsmodels.stats.contingency_tables.mcnemar",
+    "pairs": {
+      "LR vs NB": {
+        "table": {
+          "both_correct": 7960,
+          "only_A_correct": 403,
+          "only_B_correct": 234,
+          "both_wrong": 376
+        },
+        "discordant": 637,
+        "test": "chi-square with continuity correction",
+        "exact": false,
+        "continuity_correction": true,
+        "statistic": 44.30769230769231,
+        "pvalue": 2.8061140954240877e-11,
+        "significant_at_0.05": true
+      },
+      "LR vs RF": {
+        "table": {
+          "both_correct": 8177,
+          "only_A_correct": 186,
+          "only_B_correct": 158,
+          "both_wrong": 452
+        },
+        "discordant": 344,
+        "test": "chi-square with continuity correction",
+        "exact": false,
+        "continuity_correction": true,
+        "statistic": 2.119186046511628,
+        "pvalue": 0.14546383348395955,
+        "significant_at_0.05": false
+      },
+      "LR vs DistilBERT": {
+        "table": {
+          "both_correct": 8232,
+          "only_A_correct": 131,
+          "only_B_correct": 256,
+          "both_wrong": 354
+        },
+        "discordant": 387,
+        "test": "chi-square with continuity correction",
+        "exact": false,
+        "continuity_correction": true,
+        "statistic": 39.7312661498708,
+        "pvalue": 2.9142257975312156e-10,
+        "significant_at_0.05": true
+      },
+      "NB vs RF": {
+        "table": {
+          "both_correct": 7947,
+          "only_A_correct": 247,
+          "only_B_correct": 388,
+          "both_wrong": 391
+        },
+        "discordant": 635,
+        "test": "chi-square with continuity correction",
+        "exact": false,
+        "continuity_correction": true,
+        "statistic": 30.866141732283463,
+        "pvalue": 2.7645308294977506e-08,
+        "significant_at_0.05": true
+      },
+      "NB vs DistilBERT": {
+        "table": {
+          "both_correct": 8038,
+          "only_A_correct": 156,
+          "only_B_correct": 450,
+          "both_wrong": 329
+        },
+        "discordant": 606,
+        "test": "chi-square with continuity correction",
+        "exact": false,
+        "continuity_correction": true,
+        "statistic": 141.66501650165017,
+        "pvalue": 1.1511394625240489e-32,
+        "significant_at_0.05": true
+      },
+      "RF vs DistilBERT": {
+        "table": {
+          "both_correct": 8215,
+          "only_A_correct": 120,
+          "only_B_correct": 273,
+          "both_wrong": 365
+        },
+        "discordant": 393,
+        "test": "chi-square with continuity correction",
+        "exact": false,
+        "continuity_correction": true,
+        "statistic": 58.78880407124682,
+        "pvalue": 1.7553727340513775e-14,
+        "significant_at_0.05": true
+      }
+    }
+  },
+  "device_distilbert": "cuda"
+}
