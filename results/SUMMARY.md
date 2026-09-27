@@ -430,9 +430,50 @@ Features are Porter stems; bracketed forms are the training-set surface words ma
 
 ## 11. Sensitivity analysis — the `E ∪ I` label definition
 
-_Not yet produced._ Run the whole pipeline again with `TOX_LABEL_SET=ei` (scripts 03–10) to populate this section.
+The primary mapping labels CONDA's `A` (action) class toxic because that is what reproduces the original counts. This section re-runs the pipeline against `toxic = intentClass ∈ {E, I}` (1,765 toxic / 7,208 non-toxic), the dataset authors' own definition, with its own TF-IDF fit, its own hyperparameter selection and its own fine-tuned DistilBERT. Nothing is shared between the two runs except the raw text and the splits.
+
+**Scope.** The sensitivity run covers clean metrics (§11.1) and adversarial degradation (§11.2). Latency, the cascade, the preprocessing ablation and the figures were deliberately **not** re-run under `E∪I`: they are properties of the pipeline and the hardware, not of the label definition, and re-running them would produce the same numbers at significant cost. Consequently the label-robustness check in §12.1 covers only the claims that were actually recomputed; claims resting on latency or the cascade are omitted there rather than assumed to survive.
+
+### 11.1 Main metrics under both label definitions
+
+| model | macro-F1 (primary `E∪A∪I`) | macro-F1 (sensitivity `E∪I`) | Δ | recall toxic (primary) | recall toxic (`E∪I`) |
+|---|---|---|---|---|---|
+| **LR** | 0.8911 | 0.8920 | +0.0009 | 0.8183 | 0.8221 |
+| **NB** | 0.8530 | 0.8462 | -0.0068 | 0.6836 | 0.6436 |
+| **RF** | 0.8872 | 0.8874 | +0.0002 | 0.8269 | 0.8176 |
+| **DistilBERT** | 0.9121 | 0.9125 | +0.0004 | 0.8380 | 0.8334 |
+
+Selected hyperparameters differ between label sets:
+
+| model | primary | sensitivity `E∪I` |
+|---|---|---|
+| LR `C` | 1.0 | 1.0 |
+| NB `alpha` | 0.01 | 0.05 |
+| RF `max_depth` | None | None |
+| DistilBERT best epoch | 3 | 3 |
+
+### 11.2 Adversarial drop under both label definitions
+
+| model | `leetspeak` primary / `E∪I` | `char_insert` primary / `E∪I` | `whitespace` primary / `E∪I` | `swap` primary / `E∪I` |
+|---|---|---|---|---|
+| **LR** | 0.0278 / 0.0251 | 0.1994 / 0.2182 | 0.1990 / 0.2169 | 0.1213 / 0.1419 |
+| **NB** | 0.0294 / 0.0277 | 0.1848 / 0.1930 | 0.1834 / 0.1926 | 0.1022 / 0.1166 |
+| **RF** | 0.0296 / 0.0258 | 0.2051 / 0.2250 | 0.2051 / 0.2247 | 0.1225 / 0.1477 |
+| **DistilBERT** | 0.0955 / 0.1011 | 0.2071 / 0.2400 | 0.1812 / 0.2472 | 0.0894 / 0.0916 |
 
 ## 12. Conclusions, flip check, and label-definition robustness
+
+### 12.1 Does each conclusion survive the label change?
+
+A claim that holds under the primary mapping but not under `E∪I` is an artefact of labelling the action class toxic, and should not be stated unconditionally in the paper.
+
+| claim | primary `E∪A∪I` | sensitivity `E∪I` | robust to label definition? |
+|---|---|---|---|
+| `distilbert_best_on_clean` | True | True | yes |
+| `distilbert_beats_lr_significantly` | True | True | yes |
+| `distilbert_most_robust_to_attacks` | False | False | yes |
+
+Every recomputed conclusion survives the label change.
 
 ### 12.2 Against the old paper
 
@@ -452,15 +493,15 @@ _Not yet produced._ Run the whole pipeline again with `TOX_LABEL_SET=ei` (script
 
 Mean absolute macro-F1 drop across the four attacks (lower = more robust):
 
-| model | mean drop |
-|---|---|
-| NB | 0.1250 |
-| LR | 0.1369 |
-| RF | 0.1406 |
-| DistilBERT | 0.1433 |
+| model | mean drop (primary) | mean drop (`E∪I`) |
+|---|---|---|
+| NB | 0.1250 | 0.1325 |
+| LR | 0.1369 | 0.1505 |
+| RF | 0.1406 | 0.1558 |
+| DistilBERT | 0.1433 | 0.1699 |
 
 ## 13. Open items
 
 - `results/old_paper.json` is mostly empty: no metric values survived the deletion, so every old-vs-new cell above reads *not recorded*. The paper should not imply a comparison that could not be made. Fill the file in and re-run this script if the old draft turns up.
-- The `E∪I` sensitivity run (§11) has not been produced yet: `TOX_LABEL_SET=ei` for scripts 03–10.
+- The sensitivity run (§11) is complete. Any claim marked label-dependent in §12.1 needs the `A`-class caveat stated alongside it.
 - The gaming stopword whitelist (§4) currently changes nothing; either drop the claim from the paper or widen the stopword list it subtracts from.
