@@ -1,0 +1,586 @@
+{
+  "label_set": "primary",
+  "top_k": 15,
+  "n_errors_per_class": 10,
+  "lr_coefficients": {
+    "top_positive": [
+      {
+        "rank": 1,
+        "feature": "report",
+        "coefficient": 12.050349071416605,
+        "surface_forms": "report(report/reported/reports)"
+      },
+      {
+        "rank": 2,
+        "feature": "ez",
+        "coefficient": 11.7010494562801,
+        "surface_forms": "ez"
+      },
+      {
+        "rank": 3,
+        "feature": "fuck",
+        "coefficient": 9.899758291528979,
+        "surface_forms": "fuck(fuck/fucking/fucked)"
+      },
+      {
+        "rank": 4,
+        "feature": "noob",
+        "coefficient": 9.767012520292148,
+        "surface_forms": "noob(noob/noobs)"
+      },
+      {
+        "rank": 5,
+        "feature": "shit",
+        "coefficient": 8.28592163377765,
+        "surface_forms": "shit(shit/shits/shitness)"
+      },
+      {
+        "rank": 6,
+        "feature": "idiot",
+        "coefficient": 6.987932813118379,
+        "surface_forms": "idiot(idiot/idiots)"
+      },
+      {
+        "rank": 7,
+        "feature": "retard",
+        "coefficient": 6.271860168532821,
+        "surface_forms": "retard(retard/retarded/retards)"
+      },
+      {
+        "rank": 8,
+        "feature": "commend",
+        "coefficient": 6.134542052939799,
+        "surface_forms": "commend(commend/commended/commending)"
+      },
+      {
+        "rank": 9,
+        "feature": "afk",
+        "coefficient": 6.001956996608973,
+        "surface_forms": "afk(afk/afking/afks)"
+      },
+      {
+        "rank": 10,
+        "feature": "trash",
+        "coefficient": 5.890148333148686,
+        "surface_forms": "trash"
+      },
+      {
+        "rank": 11,
+        "feature": "bitch",
+        "coefficient": 5.506263014531105,
+        "surface_forms": "bitch(bitch/bitches/bitching)"
+      },
+      {
+        "rank": 12,
+        "feature": "stupid",
+        "coefficient": 5.42880115336066,
+        "surface_forms": "stupid(stupid/stupids)"
+      },
+      {
+        "rank": 13,
+        "feature": "w8",
+        "coefficient": 5.250452134369848,
+        "surface_forms": "w8"
+      },
+      {
+        "rank": 14,
+        "feature": "suck",
+        "coefficient": 5.163620373052928,
+        "surface_forms": "suck(suck/sucks/sucking)"
+      },
+      {
+        "rank": 15,
+        "feature": "paus",
+        "coefficient": 4.8814542840606,
+        "surface_forms": "paus(pause/paused/pausing)"
+      }
+    ],
+    "top_negative": [
+      {
+        "rank": 1,
+        "feature": "gg",
+        "coefficient": -2.489151988809152,
+        "surface_forms": "gg(gg/ggs)"
+      },
+      {
+        "rank": 2,
+        "feature": "ggwp",
+        "coefficient": -2.1447013994788677,
+        "surface_forms": "ggwp"
+      },
+      {
+        "rank": 3,
+        "feature": "lol",
+        "coefficient": -1.6625117194147898,
+        "surface_forms": "lol(lol/lols)"
+      },
+      {
+        "rank": 4,
+        "feature": "xd",
+        "coefficient": -1.5696490343234923,
+        "surface_forms": "xd"
+      },
+      {
+        "rank": 5,
+        "feature": "hahaha",
+        "coefficient": -1.5339959460361154,
+        "surface_forms": "hahaha"
+      },
+      {
+        "rank": 6,
+        "feature": "wew",
+        "coefficient": -1.5067755084434777,
+        "surface_forms": "wew(wew/wewe)"
+      },
+      {
+        "rank": 7,
+        "feature": "lel",
+        "coefficient": -1.5025513485444646,
+        "surface_forms": "lel(lel/lels)"
+      },
+      {
+        "rank": 8,
+        "feature": "haha",
+        "coefficient": -1.4555720981753457,
+        "surface_forms": "haha"
+      },
+      {
+        "rank": 9,
+        "feature": "done",
+        "coefficient": -1.3607054915081715,
+        "surface_forms": "done(done/donee)"
+      },
+      {
+        "rank": 10,
+        "feature": "gj",
+        "coefficient": -1.3543352800419008,
+        "surface_forms": "gj"
+      },
+      {
+        "rank": 11,
+        "feature": "ahahaha",
+        "coefficient": -1.346292840075203,
+        "surface_forms": "ahahaha"
+      },
+      {
+        "rank": 12,
+        "feature": "wp",
+        "coefficient": -1.3129011385581852,
+        "surface_forms": "wp"
+      },
+      {
+        "rank": 13,
+        "feature": "glhf",
+        "coefficient": -1.269329011476163,
+        "surface_forms": "glhf"
+      },
+      {
+        "rank": 14,
+        "feature": "hah",
+        "coefficient": -1.1855370350635515,
+        "surface_forms": "hah"
+      },
+      {
+        "rank": 15,
+        "feature": "wow",
+        "coefficient": -1.180521041930277,
+        "surface_forms": "wow"
+      }
+    ]
+  },
+  "error_analysis": {
+    "RF": {
+      "false_positives": [
+        {
+          "rank": 1,
+          "id": 8096,
+          "p_toxic": 1.0,
+          "intent_class": "O",
+          "utterance": "i rage quit",
+          "slot_classes": "P D O ",
+          "preprocessed": "rage quit"
+        },
+        {
+          "rank": 2,
+          "id": 35687,
+          "p_toxic": 1.0,
+          "intent_class": "O",
+          "utterance": "Should i say ez or something?",
+          "slot_classes": "O P O S O P ",
+          "preprocessed": "say ez someth"
+        },
+        {
+          "rank": 3,
+          "id": 15521,
+          "p_toxic": 1.0,
+          "intent_class": "O",
+          "utterance": "commend me ty",
+          "slot_classes": "O P O ",
+          "preprocessed": "commend ty"
+        },
+        {
+          "rank": 4,
+          "id": 29787,
+          "p_toxic": 1.0,
+          "intent_class": "O",
+          "utterance": "COMMEND ME [SEPA] TY",
+          "slot_classes": "O P SEPA O ",
+          "preprocessed": "commend ty"
+        },
+        {
+          "rank": 5,
+          "id": 37474,
+          "p_toxic": 1.0,
+          "intent_class": "O",
+          "utterance": "1z1",
+          "slot_classes": "O ",
+          "preprocessed": "izi"
+        },
+        {
+          "rank": 6,
+          "id": 1959,
+          "p_toxic": 1.0,
+          "intent_class": "O",
+          "utterance": "why report?",
+          "slot_classes": "O S ",
+          "preprocessed": "report"
+        },
+        {
+          "rank": 7,
+          "id": 5873,
+          "p_toxic": 0.995,
+          "intent_class": "O",
+          "utterance": "0 fucks given",
+          "slot_classes": "O T O ",
+          "preprocessed": "fuck given"
+        },
+        {
+          "rank": 8,
+          "id": 27589,
+          "p_toxic": 0.995,
+          "intent_class": "O",
+          "utterance": "omg.. check your fucking net [SEPA] ..",
+          "slot_classes": "O O P T O SEPA ",
+          "preprocessed": "omg check fuck net"
+        },
+        {
+          "rank": 9,
+          "id": 43775,
+          "p_toxic": 0.9949665551839465,
+          "intent_class": "O",
+          "utterance": "ez jungle you mean",
+          "slot_classes": "S S P O ",
+          "preprocessed": "ez jungl mean"
+        },
+        {
+          "rank": 10,
+          "id": 14085,
+          "p_toxic": 0.9909209100758397,
+          "intent_class": "O",
+          "utterance": "where are the fuckign wolf",
+          "slot_classes": "P O O T O ",
+          "preprocessed": "fuckign wolf"
+        }
+      ],
+      "false_negatives": [
+        {
+          "rank": 1,
+          "id": 41783,
+          "p_toxic": 0.0,
+          "intent_class": "E",
+          "utterance": "USLES [SEPA] hah",
+          "slot_classes": "O SEPA O ",
+          "preprocessed": "usl hah"
+        },
+        {
+          "rank": 2,
+          "id": 24024,
+          "p_toxic": 0.0,
+          "intent_class": "E",
+          "utterance": "lucky basterds :)",
+          "slot_classes": "O T O ",
+          "preprocessed": "lucki basterd"
+        },
+        {
+          "rank": 3,
+          "id": 31217,
+          "p_toxic": 0.0,
+          "intent_class": "E",
+          "utterance": "so bad",
+          "slot_classes": "O O ",
+          "preprocessed": "bad"
+        },
+        {
+          "rank": 4,
+          "id": 12250,
+          "p_toxic": 0.0,
+          "intent_class": "E",
+          "utterance": "... [SEPA] we fukin lost",
+          "slot_classes": "SEPA P T O ",
+          "preprocessed": "fukin lost"
+        },
+        {
+          "rank": 5,
+          "id": 36872,
+          "p_toxic": 0.0,
+          "intent_class": "I",
+          "utterance": "uguys so bad",
+          "slot_classes": "O O O ",
+          "preprocessed": "uguy bad"
+        },
+        {
+          "rank": 6,
+          "id": 41243,
+          "p_toxic": 0.0,
+          "intent_class": "I",
+          "utterance": "bad spokesman",
+          "slot_classes": "O O ",
+          "preprocessed": "bad spokesman"
+        },
+        {
+          "rank": 7,
+          "id": 618,
+          "p_toxic": 0.0,
+          "intent_class": "A",
+          "utterance": "sec",
+          "slot_classes": "O ",
+          "preprocessed": "sec"
+        },
+        {
+          "rank": 8,
+          "id": 38817,
+          "p_toxic": 0.0,
+          "intent_class": "I",
+          "utterance": "Dead",
+          "slot_classes": "T ",
+          "preprocessed": "dead"
+        },
+        {
+          "rank": 9,
+          "id": 35559,
+          "p_toxic": 0.0,
+          "intent_class": "A",
+          "utterance": "go end",
+          "slot_classes": "S O ",
+          "preprocessed": "go end"
+        },
+        {
+          "rank": 10,
+          "id": 29753,
+          "p_toxic": 0.0,
+          "intent_class": "I",
+          "utterance": "free mmr",
+          "slot_classes": "O D ",
+          "preprocessed": "free mmr"
+        }
+      ],
+      "fp_by_intent": {
+        "O": 372
+      },
+      "fn_by_intent": {
+        "I": 142,
+        "E": 134,
+        "A": 130
+      },
+      "n_fp_total": 372,
+      "n_fn_total": 406
+    },
+    "DistilBERT": {
+      "false_positives": [
+        {
+          "rank": 1,
+          "id": 43775,
+          "p_toxic": 0.9955905675888062,
+          "intent_class": "O",
+          "utterance": "ez jungle you mean",
+          "slot_classes": "S S P O ",
+          "preprocessed": "ez jungl mean"
+        },
+        {
+          "rank": 2,
+          "id": 40276,
+          "p_toxic": 0.9952853322029114,
+          "intent_class": "O",
+          "utterance": "g",
+          "slot_classes": "O ",
+          "preprocessed": "g"
+        },
+        {
+          "rank": 3,
+          "id": 44608,
+          "p_toxic": 0.9946276545524597,
+          "intent_class": "O",
+          "utterance": "fnish this game [SEPA] and report blue",
+          "slot_classes": "O P O SEPA O S O ",
+          "preprocessed": "fnish game report blue"
+        },
+        {
+          "rank": 4,
+          "id": 26632,
+          "p_toxic": 0.9942663311958313,
+          "intent_class": "O",
+          "utterance": "lol we have useless doom idiots",
+          "slot_classes": "O P O O C T ",
+          "preprocessed": "lol useless doom idiot"
+        },
+        {
+          "rank": 5,
+          "id": 35687,
+          "p_toxic": 0.993251621723175,
+          "intent_class": "O",
+          "utterance": "Should i say ez or something?",
+          "slot_classes": "O P O S O P ",
+          "preprocessed": "say ez someth"
+        },
+        {
+          "rank": 6,
+          "id": 30638,
+          "p_toxic": 0.9917337894439697,
+          "intent_class": "O",
+          "utterance": "pls finish [SEPA] its hard with 3 idiot",
+          "slot_classes": "O O SEPA P O O O T ",
+          "preprocessed": "pl finish hard e idiot"
+        },
+        {
+          "rank": 7,
+          "id": 33942,
+          "p_toxic": 0.991592526435852,
+          "intent_class": "O",
+          "utterance": "bkb [SEPA] haha [SEPA] stupid players",
+          "slot_classes": "D SEPA O SEPA T O ",
+          "preprocessed": "bkb haha stupid player"
+        },
+        {
+          "rank": 8,
+          "id": 18401,
+          "p_toxic": 0.9913610816001892,
+          "intent_class": "O",
+          "utterance": "hes garbage, mmr means shit",
+          "slot_classes": "O O D O T ",
+          "preprocessed": "he garbag mmr mean shit"
+        },
+        {
+          "rank": 9,
+          "id": 1959,
+          "p_toxic": 0.9877585768699646,
+          "intent_class": "O",
+          "utterance": "why report?",
+          "slot_classes": "O S ",
+          "preprocessed": "report"
+        },
+        {
+          "rank": 10,
+          "id": 11585,
+          "p_toxic": 0.987080991268158,
+          "intent_class": "O",
+          "utterance": "HAHAHA [SEPA] this fucking pc [SEPA] restarted himself",
+          "slot_classes": "O SEPA P T O SEPA O P ",
+          "preprocessed": "hahaha fuck pc restart"
+        }
+      ],
+      "false_negatives": [
+        {
+          "rank": 1,
+          "id": 35582,
+          "p_toxic": 0.0005323328077793121,
+          "intent_class": "I",
+          "utterance": "LMAO",
+          "slot_classes": "O ",
+          "preprocessed": "lmao"
+        },
+        {
+          "rank": 2,
+          "id": 34025,
+          "p_toxic": 0.0006775783258490264,
+          "intent_class": "I",
+          "utterance": "?",
+          "slot_classes": "nan",
+          "preprocessed": ""
+        },
+        {
+          "rank": 3,
+          "id": 34388,
+          "p_toxic": 0.0007201623520813882,
+          "intent_class": "E",
+          "utterance": ")",
+          "slot_classes": "nan",
+          "preprocessed": ""
+        },
+        {
+          "rank": 4,
+          "id": 34422,
+          "p_toxic": 0.0007391534163616598,
+          "intent_class": "E",
+          "utterance": "haha [SEPA] NT [SEPA] :P",
+          "slot_classes": "O SEPA O SEPA O ",
+          "preprocessed": "haha nt p"
+        },
+        {
+          "rank": 5,
+          "id": 30943,
+          "p_toxic": 0.0007803102489560843,
+          "intent_class": "A",
+          "utterance": "zz",
+          "slot_classes": "S ",
+          "preprocessed": "zz"
+        },
+        {
+          "rank": 6,
+          "id": 3125,
+          "p_toxic": 0.0008137030526995659,
+          "intent_class": "I",
+          "utterance": "gg sf",
+          "slot_classes": "S C ",
+          "preprocessed": "gg sf"
+        },
+        {
+          "rank": 7,
+          "id": 32632,
+          "p_toxic": 0.0009035953553393483,
+          "intent_class": "I",
+          "utterance": "And he comes right in, to me",
+          "slot_classes": "O P O O O O P ",
+          "preprocessed": "come right"
+        },
+        {
+          "rank": 8,
+          "id": 37471,
+          "p_toxic": 0.0009655553731136024,
+          "intent_class": "I",
+          "utterance": "ISI",
+          "slot_classes": "O ",
+          "preprocessed": "isi"
+        },
+        {
+          "rank": 9,
+          "id": 18503,
+          "p_toxic": 0.0011879467638209462,
+          "intent_class": "E",
+          "utterance": "haha [SEPA] Free hit",
+          "slot_classes": "O SEPA O O ",
+          "preprocessed": "haha free hit"
+        },
+        {
+          "rank": 10,
+          "id": 39908,
+          "p_toxic": 0.0012513119727373123,
+          "intent_class": "A",
+          "utterance": "just end",
+          "slot_classes": "O O ",
+          "preprocessed": "end"
+        }
+      ],
+      "fp_by_intent": {
+        "O": 215
+      },
+      "fn_by_intent": {
+        "I": 142,
+        "E": 135,
+        "A": 103
+      },
+      "n_fp_total": 215,
+      "n_fn_total": 380
+    }
+  },
+  "notes": "Features are Porter stems from the classical pipeline. 'Highest-confidence' errors are those furthest on the wrong side of the 0.5 threshold."
+}
