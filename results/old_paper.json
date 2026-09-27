@@ -1,0 +1,86 @@
+{
+  "_README": [
+    "Known values from the ORIGINAL (deleted) study, for side-by-side comparison",
+    "in results/SUMMARY.md. Script 11 reads this file; anything set to null is",
+    "reported as 'not recorded' rather than guessed.",
+    "",
+    "PROVENANCE: the original project directory and its Claude Code transcripts",
+    "were deleted. The only surviving artefact was one memory note at",
+    ".claude/projects/c--Users-UPASANA-GameRe/memory/project_toxicity_study.md,",
+    "which recorded the dataset decisions and split sizes but NO metric values.",
+    "",
+    "TO FILL THIS IN: if you still have the old paper draft, a results PDF, a",
+    "spreadsheet or an old log, put the numbers here and re-run",
+    "'python src/11_summary.py'. The old-vs-new columns and the flip detection",
+    "will populate automatically. Do not edit numbers anywhere else."
+  ],
+
+  "splits": {
+    "train_n": 21531,
+    "val_n": 5383,
+    "test_n": 8973,
+    "test_toxic": 2345,
+    "test_non_toxic": 6628,
+    "test_toxic_pct": 26.1,
+    "_source": "memory note (project_toxicity_study.md)"
+  },
+
+  "label_mapping": {
+    "rule": "toxic = intentClass != 'O'  (E + A + I)",
+    "_source": "inferred: it is the unique mapping reproducing 2345/6628"
+  },
+
+  "metrics": {
+    "_note": "NOT RECORDED - no metric values survived the deletion.",
+    "LR": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
+           "roc_auc": null, "pr_auc": null, "recall_toxic": null,
+           "false_positives": null},
+    "NB": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
+           "roc_auc": null, "pr_auc": null, "recall_toxic": null,
+           "false_positives": null},
+    "RF": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
+           "roc_auc": null, "pr_auc": null, "recall_toxic": null,
+           "false_positives": null},
+    "DistilBERT": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
+                   "roc_auc": null, "pr_auc": null, "recall_toxic": null,
+                   "false_positives": null}
+  },
+
+  "hyperparameters": {
+    "_note": "NOT RECORDED.",
+    "LR_C": null,
+    "NB_alpha": null,
+    "RF_max_depth": null,
+    "distilbert_best_epoch": null
+  },
+
+  "adversarial_macro_f1_drop": {
+    "_note": "NOT RECORDED.",
+    "leetspeak": {"LR": null, "NB": null, "RF": null, "DistilBERT": null},
+    "char_insert": {"LR": null, "NB": null, "RF": null, "DistilBERT": null},
+    "whitespace": {"LR": null, "NB": null, "RF": null, "DistilBERT": null},
+    "swap": {"LR": null, "NB": null, "RF": null, "DistilBERT": null}
+  },
+
+  "latency_ms": {
+    "_note": "NOT RECORDED. The original study reportedly timed DistilBERT CPU with only 100 iterations; this rebuild uses 1000.",
+    "LR": null, "NB": null, "RF": null,
+    "DistilBERT_cpu": null, "DistilBERT_gpu": null
+  },
+
+  "cascade": {
+    "_note": "NOT RECORDED.",
+    "default_band": [0.4, 0.7],
+    "escalation_rate": null,
+    "macro_f1": null
+  },
+
+  "conclusions": {
+    "_note": "State the old paper's qualitative claims here as true/false/null so flips are detected automatically.",
+    "distilbert_best_on_clean": null,
+    "distilbert_beats_lr_significantly": null,
+    "distilbert_most_robust_to_attacks": null,
+    "cascade_matches_distilbert_within_ci": null,
+    "rf_njobs_parallel_faster_single_example": null
+  }
+}
