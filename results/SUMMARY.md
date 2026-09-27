@@ -43,6 +43,23 @@ Not an error, but the old DistilBERT latency figures rest on 10x fewer samples t
 - **Observed** — the plotted x-axis is linear (0-80 ms, evenly spaced)
 - **This rebuild** — x-axis is genuinely log-scaled
 
+## 1. Environment
+
+| item | value |
+|---|---|
+| CPU | AMD Ryzen 7 7445HS w/ Radeon 740M Graphics |
+| cores | 6 physical / 12 logical |
+| RAM | 31.23 GiB |
+| GPU | NVIDIA GeForce RTX 4050 Laptop GPU (6141 MiB) |
+| OS | Windows-11-10.0.26200-SP0 |
+| python | 3.12.9 |
+| torch | 2.6.0+cu124 |
+| transformers | 5.17.0 |
+| sklearn | 1.9.1 |
+| statsmodels | 0.15.0 |
+| numpy | 2.5.3 |
+| pandas | 3.0.6 |
+
 ## 2. Label mapping
 
 CONDA provides no binary label. Candidate mappings and the counts each produces on the 8,973-row test set:
@@ -122,8 +139,294 @@ DistilBERT receives only: lowercase, strip_urls_mentions.
 | LR | `C` | 5-fold CV on train, macro-F1 | 1.0 | _not recorded_ |
 | NB | `alpha` | val split, macro-F1 | 0.01 | _not recorded_ |
 | RF | `max_depth` | 5-fold CV on train, macro-F1 | None | _not recorded_ |
+| DistilBERT | epoch | best val macro-F1 | 3 | _not recorded_ |
 
 TF-IDF: `ngram_range=[1, 2]`, `max_features=20000`, `sublinear_tf=True`, `min_df=2`, fitted on train only → 5035 features (2575 unigrams / 2460 bigrams).
+
+DistilBERT: 3 epochs, best epoch 3 (val macro-F1 0.9075), peak GPU memory 2.03 GiB, total train time 9.3 min on NVIDIA GeForce RTX 4050 Laptop GPU.
+
+## 6. Main results — clean test set
+
+Format: `new (old) [delta]`. Threshold 0.5. n = 8973 (2345 toxic / 6628 non-toxic).
+
+| model | accuracy | macro-F1 | weighted-F1 | ROC-AUC | PR-AUC | recall (toxic) | FP count |
+|---|---|---|---|---|---|---|---|
+| **LR** | 0.9172 (0.9150) [+0.0022] | 0.8911 (0.8900) [+0.0011] | 0.9165 (0.9150) [+0.0015] | 0.9439 (0.9530) [-0.0091] | 0.8990 (0.9070) [-0.0080] | 0.8183 (0.8400) [-0.0217] | 317 (389) [-72] |
+| **NB** | 0.8956 (0.9040) [-0.0084] | 0.8530 (0.8630) [-0.0100] | 0.8908 (0.8990) [-0.0082] | 0.8915 (0.9260) [-0.0345] | 0.8345 (0.8790) [-0.0445] | 0.6836 (0.6890) [-0.0054] | 195 (134) [+61] |
+| **RF** | 0.9133 (0.9220) [-0.0087] | 0.8872 (0.8960) [-0.0088] | 0.9131 (0.9210) [-0.0079] | 0.9355 (0.9410) [-0.0055] | 0.8897 (0.8970) [-0.0073] | 0.8269 (0.7980) [+0.0289] | 372 (225) [+147] |
+| **DistilBERT** | 0.9337 (0.9340) [-0.0003] | 0.9121 (0.9130) [-0.0009] | 0.9329 (0.9340) [-0.0011] | 0.9670 (0.9670) [+0.0000] | 0.9356 (0.9370) [-0.0014] | 0.8380 (0.8510) [-0.0130] | 215 (241) [-26] |
+
+FP count = false positives among the 6628 non-toxic utterances.
+
+### 6.1 95% bootstrap CI on macro-F1
+
+1000 resamples, seed 42, percentile, paired (shared resample indices) — resample indices shared across models so intervals are directly comparable.
+
+| model | macro-F1 | 95% CI | width |
+|---|---|---|---|
+| LR | 0.8911 | [0.8834, 0.8979] | 0.0145 |
+| NB | 0.8530 | [0.8433, 0.8611] | 0.0177 |
+| RF | 0.8872 | [0.8794, 0.8944] | 0.0150 |
+| DistilBERT | 0.9121 | [0.9050, 0.9188] | 0.0139 |
+
+### 6.2 Pairwise McNemar
+
+`statsmodels.stats.contingency_tables.mcnemar`. Rule: exact binomial if discordant < 25 else chi-square with continuity correction.
+
+| pair | discordant (b, c) | test used | statistic | p-value (new) | p-value (old) | significant (α=0.05) |
+|---|---|---|---|---|---|---|
+| LR vs NB | 680 (437, 243) | chi-square with continuity correction | 54.778 | 1.349e-13 | 2.5e-04 | **yes** |
+| LR vs RF | 343 (189, 154) | chi-square with continuity correction | 3.370 | 6.638e-02 | 1.1e-03 | no |
+| LR vs DistilBERT | 458 (155, 303) | chi-square with continuity correction | 47.181 | 6.472e-12 | 1.2e-14 | **yes** |
+| NB vs RF | 735 (288, 447) | chi-square with continuity correction | 33.965 | 5.612e-09 | 3.7e-12 | **yes** |
+| NB vs DistilBERT | 702 (180, 522) | chi-square with continuity correction | 165.642 | 6.622e-38 | 1.9e-26 | **yes** |
+| RF vs DistilBERT | 483 (150, 333) | chi-square with continuity correction | 68.580 | 1.219e-16 | 8.3e-08 | **yes** |
+
+The paper reported all six pairs significant at α = 0.01. Any pair above that is *not* significant is a genuine disagreement with the old result, not a presentation difference.
+
+## 7. Adversarial robustness
+
+**Threat model.** Attacks applied to RAW toxic utterances, then passed through each model's normal preprocessing. Non-toxic rows untouched; macro-F1 computed over the full test set.
+
+Candidate-token rule: CONDA token-level slot tag in {T, C} when the annotation aligns with the tokens; otherwise alphabetic, len>=3, non-stopword.
+
+| attack | definition |
+|---|---|
+| `leetspeak` | per char of candidate tokens, p=0.5: a->4 e->3 i->1 o->0 s->$ t->7 |
+| `char_insert` | random punctuation from '.-_*`~^' between internal characters |
+| `whitespace` | space between internal characters |
+| `swap` | one adjacent transposition per candidate token |
+
+### 7.1 Macro-F1 under attack
+
+| model | clean | `leetspeak` | `char_insert` | `whitespace` | `swap` |
+|---|---|---|---|---|---|
+| **LR** | 0.8911 | 0.8633 | 0.6917 | 0.6921 | 0.7698 |
+| **NB** | 0.8530 | 0.8236 | 0.6682 | 0.6695 | 0.7508 |
+| **RF** | 0.8872 | 0.8576 | 0.6821 | 0.6821 | 0.7647 |
+| **DistilBERT** | 0.9121 | 0.8166 | 0.7050 | 0.7309 | 0.8227 |
+
+### 7.2 Absolute drop from clean (higher = more fragile)
+
+| model | `leetspeak` | `char_insert` | `whitespace` | `swap` |
+|---|---|---|---|---|
+| **LR** | 0.0278 (0.2050) [-0.1772] | 0.1994 (0.2130) [-0.0136] | 0.1990 (0.0890) [+0.1100] | 0.1213 (0.0690) [+0.0523] |
+| **NB** | 0.0294 (0.2220) [-0.1926] | 0.1848 (0.2940) [-0.1092] | 0.1834 (0.1140) [+0.0694] | 0.1022 (0.0620) [+0.0402] |
+| **RF** | 0.0296 (0.2210) [-0.1914] | 0.2051 (0.2180) [-0.0129] | 0.2051 (0.0900) [+0.1151] | 0.1225 (0.0770) [+0.0455] |
+| **DistilBERT** | 0.0955 (0.1700) [-0.0745] | 0.2071 (0.1750) [+0.0321] | 0.1812 (0.0650) [+0.1162] | 0.0894 (0.0490) [+0.0404] |
+
+### 7.3 Ablation — classical defences disabled at inference
+
+Models trained with the full pipeline; only inference-time preprocessing is ablated.
+
+| config | model | clean | `leetspeak` | `char_insert` | `whitespace` | `swap` |
+|---|---|---|---|---|---|---|
+| `full_pipeline` | LR | 0.8911 | 0.8633 (-0.028) | 0.6917 (-0.199) | 0.6921 (-0.199) | 0.7698 (-0.121) |
+| `full_pipeline` | NB | 0.8530 | 0.8236 (-0.029) | 0.6682 (-0.185) | 0.6695 (-0.183) | 0.7508 (-0.102) |
+| `full_pipeline` | RF | 0.8872 | 0.8576 (-0.030) | 0.6821 (-0.205) | 0.6821 (-0.205) | 0.7647 (-0.123) |
+| `leetspeak_OFF` | LR | 0.8911 | 0.7761 (-0.115) | 0.6888 (-0.202) | 0.6893 (-0.202) | 0.7683 (-0.123) |
+| `leetspeak_OFF` | NB | 0.8539 | 0.7436 (-0.110) | 0.6675 (-0.186) | 0.6688 (-0.185) | 0.7508 (-0.103) |
+| `leetspeak_OFF` | RF | 0.8874 | 0.7645 (-0.123) | 0.6798 (-0.208) | 0.6798 (-0.208) | 0.7638 (-0.124) |
+| `punctuation_OFF` | LR | 0.8893 | 0.8613 (-0.028) | 0.6895 (-0.200) | 0.6900 (-0.199) | 0.7680 (-0.121) |
+| `punctuation_OFF` | NB | 0.8521 | 0.8229 (-0.029) | 0.6661 (-0.186) | 0.6674 (-0.185) | 0.7497 (-0.102) |
+| `punctuation_OFF` | RF | 0.8860 | 0.8561 (-0.030) | 0.6801 (-0.206) | 0.6801 (-0.206) | 0.7633 (-0.123) |
+| `both_OFF` | LR | 0.8894 | 0.7739 (-0.116) | 0.6869 (-0.203) | 0.6873 (-0.202) | 0.7666 (-0.123) |
+| `both_OFF` | NB | 0.8533 | 0.7419 (-0.111) | 0.6657 (-0.188) | 0.6670 (-0.186) | 0.7501 (-0.103) |
+| `both_OFF` | RF | 0.8863 | 0.7628 (-0.124) | 0.6779 (-0.208) | 0.6779 (-0.208) | 0.7626 (-0.124) |
+
+Cells are `macro-F1 (change vs that config's own clean score)`.
+
+### 7.4 Audit — what the vectoriser actually receives
+
+20 examples per attack were logged; the first 3 of each are shown here, the rest are in `results/06_adversarial.json` under `audit_samples`.
+
+**`leetspeak`**
+
+| raw | perturbed | reaches vectoriser as | in-vocab terms (clean → attacked) |
+|---|---|---|---|
+| `FUK` | `FUK` | `fuk` | 1 → 1 |
+| `retard ss [SEPA] reported` | `re74rd $s [SEPA] reported` | `re7ard ss report` | 3 → 2 |
+| `repot him [SEPA] report omni please` | `repot him [SEPA] report omni please` | `repot report omni pleas` | 3 → 3 |
+
+**`char_insert`**
+
+| raw | perturbed | reaches vectoriser as | in-vocab terms (clean → attacked) |
+|---|---|---|---|
+| `FUK` | `F~U.K` | `f u k` | 1 → 0 |
+| `retard ss [SEPA] reported` | `r.e~t_a-r-d ss [SEPA] reported` | `r e t_a r ss report` | 3 → 2 |
+| `repot him [SEPA] report omni please` | `repot him [SEPA] report o-m~n.i please` | `repot report n pleas` | 3 → 2 |
+
+**`whitespace`**
+
+| raw | perturbed | reaches vectoriser as | in-vocab terms (clean → attacked) |
+|---|---|---|---|
+| `FUK` | `F U K` | `f u k` | 1 → 0 |
+| `retard ss [SEPA] reported` | `r e t a r d ss [SEPA] reported` | `r e r ss report` | 3 → 2 |
+| `repot him [SEPA] report omni please` | `repot him [SEPA] report o m n i please` | `repot report n pleas` | 3 → 2 |
+
+**`swap`**
+
+| raw | perturbed | reaches vectoriser as | in-vocab terms (clean → attacked) |
+|---|---|---|---|
+| `FUK` | `FUK` | `fuk` | 1 → 1 |
+| `retard ss [SEPA] reported` | `retrad ss [SEPA] reported` | `retrad ss report` | 3 → 2 |
+| `repot him [SEPA] report omni please` | `repot him [SEPA] report onmi please` | `repot report onmi pleas` | 3 → 2 |
+
+## 8. Inference latency
+
+100 warmup, 1000 timed single-example predictions, batch size 32, clock `time.perf_counter`. **Primary metric: end-to-end.** end-to-end = raw string -> preprocessing -> vectoriser/tokeniser -> predict. model_only excludes preprocessing and vectorisation/tokenisation.
+
+| configuration | mean (ms) | p50 | p95 | p99 | model-only mean | batch-32 ex/s | batch-32 ms/ex | old mean |
+|---|---|---|---|---|---|---|---|---|
+| LR (CPU) | 0.893 | 0.755 | 1.472 | 2.689 | 0.175 | 11418.1 | 0.088 | 0.450 |
+| NB (CPU) | 0.953 | 0.836 | 1.539 | 2.014 | 0.275 | 11053.9 | 0.090 | 0.480 |
+| RF `n_jobs=1` (CPU) | 19.960 | 18.922 | 26.551 | 34.659 | 18.435 | 633.1 | 1.579 | 51.890 |
+| RF `n_jobs=-1` (CPU) | 50.367 | 48.732 | 57.983 | 68.146 | 55.615 | 486.5 | 2.055 | _not recorded_ |
+| DistilBERT (CPU) | 19.415 | 19.070 | 24.299 | 29.254 | 19.005 | 94.8 | 10.546 | 82.000 |
+| DistilBERT (GPU fp32) | 6.674 | 6.447 | 8.450 | 10.041 | 5.760 | 1994.3 | 0.501 | _not recorded_ |
+| DistilBERT (GPU fp16 autocast) | 9.448 | 9.139 | 12.035 | 13.696 | 9.013 | 2498.4 | 0.400 | _not recorded_ |
+
+DistilBERT CPU used `torch.get_num_threads() = 6` (interop 6).
+
+GPU timing: torch.cuda.synchronize() called before stopping every timer; eval mode + torch.inference_mode().
+
+**RF `n_jobs`:** single-example end-to-end is 19.960 ms at `n_jobs=1` vs 50.367 ms at `n_jobs=-1` — parallelism is a net loss on single examples (+152.3%).
+
+## 9. Cascade (LR first, DistilBERT on uncertainty)
+
+Rule: LR decides unless low <= P_LR(toxic) <= high, in which case DistilBERT decides. Expected latency model: `E[latency] = lat_LR + escalation_rate * lat_DistilBERT`, using results/07_latency.json, end-to-end single-example means (primary metric).
+
+**Band [0.4, 0.7] (default)**
+
+| variant | escalated | macro-F1 | 95% CI | E[ms] BERT-CPU | E[ms] BERT-GPU |
+|---|---|---|---|---|---|
+| clean | 8.37% | 0.9039 | [0.8964, 0.9104] | 2.518 | 1.452 |
+| leetspeak | 8.73% | 0.8639 | [0.8551, 0.8718] | 2.587 | 1.476 |
+| char_insert | 7.65% | 0.6859 | [0.6742, 0.6981] | 2.378 | 1.403 |
+| whitespace | 7.68% | 0.6874 | [0.6758, 0.6994] | 2.384 | 1.406 |
+| swap | 9.02% | 0.7675 | [0.7574, 0.7782] | 2.644 | 1.495 |
+
+**Band [0.3, 0.8]**
+
+| variant | escalated | macro-F1 | 95% CI | E[ms] BERT-CPU | E[ms] BERT-GPU |
+|---|---|---|---|---|---|
+| clean | 18.42% | 0.9060 | [0.8984, 0.9126] | 4.470 | 2.123 |
+| leetspeak | 18.70% | 0.8582 | [0.8499, 0.8663] | 4.524 | 2.141 |
+| char_insert | 16.75% | 0.6861 | [0.6742, 0.6984] | 4.145 | 2.011 |
+| whitespace | 16.78% | 0.6907 | [0.6786, 0.7034] | 4.152 | 2.013 |
+| swap | 18.76% | 0.7750 | [0.7650, 0.7855] | 4.535 | 2.145 |
+
+**Band [0.2, 0.9]**
+
+| variant | escalated | macro-F1 | 95% CI | E[ms] BERT-CPU | E[ms] BERT-GPU |
+|---|---|---|---|---|---|
+| clean | 47.00% | 0.9109 | [0.9037, 0.9173] | 10.018 | 4.030 |
+| leetspeak | 47.93% | 0.8510 | [0.8421, 0.8592] | 10.199 | 4.092 |
+| char_insert | 51.31% | 0.7020 | [0.6906, 0.7139] | 10.855 | 4.318 |
+| whitespace | 51.44% | 0.7236 | [0.7128, 0.7354] | 10.881 | 4.327 |
+| swap | 50.14% | 0.8103 | [0.8006, 0.8205] | 10.628 | 4.240 |
+
+Reference, no cascade:
+
+| variant | LR alone | DistilBERT alone |
+|---|---|---|
+| clean | 0.8911 | 0.9121 |
+| leetspeak | 0.8633 | 0.8166 |
+| char_insert | 0.6917 | 0.7050 |
+| whitespace | 0.6921 | 0.7309 |
+| swap | 0.7698 | 0.8227 |
+
+## 10. Error analysis and interpretation
+
+### 10.1 Top 15 LR coefficients
+
+| rank | → toxic | coef | → non-toxic | coef |
+|---|---|---|---|---|
+| 1 | `report(report/reported/reports)` | +12.0503 | `gg(gg/ggs)` | -2.4892 |
+| 2 | `ez` | +11.7010 | `ggwp` | -2.1447 |
+| 3 | `fuck(fuck/fucking/fucked)` | +9.8998 | `lol(lol/lols)` | -1.6625 |
+| 4 | `noob(noob/noobs)` | +9.7670 | `xd` | -1.5696 |
+| 5 | `shit(shit/shits/shitness)` | +8.2859 | `hahaha` | -1.5340 |
+| 6 | `idiot(idiot/idiots)` | +6.9879 | `wew(wew/wewe)` | -1.5068 |
+| 7 | `retard(retard/retarded/retards)` | +6.2719 | `lel(lel/lels)` | -1.5026 |
+| 8 | `commend(commend/commended/commending)` | +6.1345 | `haha` | -1.4556 |
+| 9 | `afk(afk/afking/afks)` | +6.0020 | `done(done/donee)` | -1.3607 |
+| 10 | `trash` | +5.8901 | `gj` | -1.3543 |
+| 11 | `bitch(bitch/bitches/bitching)` | +5.5063 | `ahahaha` | -1.3463 |
+| 12 | `stupid(stupid/stupids)` | +5.4288 | `wp` | -1.3129 |
+| 13 | `w8` | +5.2505 | `glhf` | -1.2693 |
+| 14 | `suck(suck/sucks/sucking)` | +5.1636 | `hah` | -1.1855 |
+| 15 | `paus(pause/paused/pausing)` | +4.8815 | `wow` | -1.1805 |
+
+Features are Porter stems; bracketed forms are the training-set surface words mapping onto that stem.
+
+### 10.2 RF — highest-confidence errors
+
+372 false positives and 406 false negatives in total. By gold intent class — FP: `{'O': 372}`; FN: `{'I': 142, 'E': 134, 'A': 130}`.
+
+**False positives** (gold non-toxic, predicted toxic)
+
+| # | P(toxic) | intent | utterance |
+|---|---|---|---|
+| 1 | 1.0000 | `O` | `i rage quit` |
+| 2 | 1.0000 | `O` | `Should i say ez or something?` |
+| 3 | 1.0000 | `O` | `commend me ty` |
+| 4 | 1.0000 | `O` | `COMMEND ME [SEPA] TY` |
+| 5 | 1.0000 | `O` | `1z1` |
+| 6 | 1.0000 | `O` | `why report?` |
+| 7 | 0.9950 | `O` | `0 fucks given` |
+| 8 | 0.9950 | `O` | `omg.. check your fucking net [SEPA] ..` |
+| 9 | 0.9950 | `O` | `ez jungle you mean` |
+| 10 | 0.9909 | `O` | `where are the fuckign wolf` |
+
+**False negatives** (gold toxic, predicted non-toxic)
+
+| # | P(toxic) | intent | utterance |
+|---|---|---|---|
+| 1 | 0.0000 | `E` | `USLES [SEPA] hah` |
+| 2 | 0.0000 | `E` | `lucky basterds :)` |
+| 3 | 0.0000 | `E` | `so bad` |
+| 4 | 0.0000 | `E` | `... [SEPA] we fukin lost` |
+| 5 | 0.0000 | `I` | `uguys so bad` |
+| 6 | 0.0000 | `I` | `bad spokesman` |
+| 7 | 0.0000 | `A` | `sec` |
+| 8 | 0.0000 | `I` | `Dead` |
+| 9 | 0.0000 | `A` | `go end` |
+| 10 | 0.0000 | `I` | `free mmr` |
+
+### 10.2 DistilBERT — highest-confidence errors
+
+215 false positives and 380 false negatives in total. By gold intent class — FP: `{'O': 215}`; FN: `{'I': 142, 'E': 135, 'A': 103}`.
+
+**False positives** (gold non-toxic, predicted toxic)
+
+| # | P(toxic) | intent | utterance |
+|---|---|---|---|
+| 1 | 0.9956 | `O` | `ez jungle you mean` |
+| 2 | 0.9953 | `O` | `g` |
+| 3 | 0.9946 | `O` | `fnish this game [SEPA] and report blue` |
+| 4 | 0.9943 | `O` | `lol we have useless doom idiots` |
+| 5 | 0.9933 | `O` | `Should i say ez or something?` |
+| 6 | 0.9917 | `O` | `pls finish [SEPA] its hard with 3 idiot` |
+| 7 | 0.9916 | `O` | `bkb [SEPA] haha [SEPA] stupid players` |
+| 8 | 0.9914 | `O` | `hes garbage, mmr means shit` |
+| 9 | 0.9878 | `O` | `why report?` |
+| 10 | 0.9871 | `O` | `HAHAHA [SEPA] this fucking pc [SEPA] restarted himself` |
+
+**False negatives** (gold toxic, predicted non-toxic)
+
+| # | P(toxic) | intent | utterance |
+|---|---|---|---|
+| 1 | 0.0005 | `I` | `LMAO` |
+| 2 | 0.0007 | `I` | `?` |
+| 3 | 0.0007 | `E` | `)` |
+| 4 | 0.0007 | `E` | `haha [SEPA] NT [SEPA] :P` |
+| 5 | 0.0008 | `A` | `zz` |
+| 6 | 0.0008 | `I` | `gg sf` |
+| 7 | 0.0009 | `I` | `And he comes right in, to me` |
+| 8 | 0.0010 | `I` | `ISI` |
+| 9 | 0.0012 | `E` | `haha [SEPA] Free hit` |
+| 10 | 0.0013 | `A` | `just end` |
 
 ## 11. Sensitivity analysis — the `E ∪ I` label definition
 
@@ -135,8 +438,26 @@ _Not yet produced._ Run the whole pipeline again with `TOX_LABEL_SET=ei` (script
 
 | claim | this rebuild | old paper | status |
 |---|---|---|---|
+| `distilbert_best_on_clean` | True | True | consistent |
+| `distilbert_beats_lr_significantly` | True | True | consistent |
+| `distilbert_most_robust_to_attacks` | False | True | **FLIPPED** |
+| `cascade_matches_distilbert_within_ci` | False | _not recorded_ | no old value — cannot compare |
+| `rf_njobs_parallel_faster_single_example` | False | _not recorded_ | no old value — cannot compare |
 
-No flips detected against recorded old claims. Note that most old claims were *not recorded*, so this is an absence of evidence, not evidence of agreement.
+### Conclusions that FLIPPED
+
+- **`distilbert_most_robust_to_attacks`** — was `True`, now `False`.
+
+### 12.3 Observed robustness ordering (this rebuild)
+
+Mean absolute macro-F1 drop across the four attacks (lower = more robust):
+
+| model | mean drop |
+|---|---|
+| NB | 0.1250 |
+| LR | 0.1369 |
+| RF | 0.1406 |
+| DistilBERT | 0.1433 |
 
 ## 13. Open items
 
