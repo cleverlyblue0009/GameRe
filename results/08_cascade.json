@@ -1,0 +1,245 @@
+{
+  "label_set": "primary",
+  "label_rule": "toxic = intentClass != 'O'  (E + A + I)",
+  "bands": [
+    [
+      0.4,
+      0.7
+    ],
+    [
+      0.3,
+      0.8
+    ],
+    [
+      0.2,
+      0.9
+    ]
+  ],
+  "default_band": [
+    0.4,
+    0.7
+  ],
+  "rule": "LR decides unless low <= P_LR(toxic) <= high, in which case DistilBERT decides",
+  "latency_model": "E[latency] = lat_LR + escalation_rate * lat_DistilBERT",
+  "latency_source": "results/07_latency.json, end-to-end single-example means (primary metric)",
+  "latencies_used_ms": {
+    "LR": 0.8932037002232391,
+    "bert_cpu": 19.414977900334634,
+    "bert_gpu": 6.674341899779392
+  },
+  "bootstrap": {
+    "n_resamples": 1000,
+    "seed": 42,
+    "method": "percentile, shared resample indices"
+  },
+  "results": {
+    "[0.4, 0.7]": {
+      "clean": {
+        "escalation_rate": 0.08369553103755711,
+        "n_escalated": 751,
+        "macro_f1": 0.9039064260886309,
+        "bootstrap_ci": {
+          "ci_low": 0.8964030137648779,
+          "ci_high": 0.9104166346085295,
+          "mean": 0.9038736040889319
+        },
+        "expected_ms_bert_cpu": 2.518150585674182,
+        "expected_ms_bert_gpu": 1.451816289851493
+      },
+      "leetspeak": {
+        "escalation_rate": 0.08726178535606821,
+        "n_escalated": 783,
+        "macro_f1": 0.8639404211442596,
+        "bootstrap_ci": {
+          "ci_low": 0.8550810084256162,
+          "ci_high": 0.8718210444380509,
+          "mean": 0.8637878977385801
+        },
+        "expected_ms_bert_cpu": 2.5873893344550476,
+        "expected_ms_bert_gpu": 1.475618690474801
+      },
+      "char_insert": {
+        "escalation_rate": 0.07645157695308147,
+        "n_escalated": 686,
+        "macro_f1": 0.6858520574009195,
+        "bootstrap_ci": {
+          "ci_low": 0.6741854894596679,
+          "ci_high": 0.698081450619179,
+          "mean": 0.685967564418399
+        },
+        "expected_ms_bert_cpu": 2.3775093772130482,
+        "expected_ms_bert_gpu": 1.4034676635853993
+      },
+      "whitespace": {
+        "escalation_rate": 0.07678591329544188,
+        "n_escalated": 689,
+        "macro_f1": 0.6873787375677086,
+        "bootstrap_ci": {
+          "ci_low": 0.6758215244915454,
+          "ci_high": 0.6994471027331057,
+          "mean": 0.6875204033019717
+        },
+        "expected_ms_bert_cpu": 2.3840005099112545,
+        "expected_ms_bert_gpu": 1.4056991386438344
+      },
+      "swap": {
+        "escalation_rate": 0.09015936698985846,
+        "n_escalated": 809,
+        "macro_f1": 0.7674626654615802,
+        "bootstrap_ci": {
+          "ci_low": 0.7574179527636095,
+          "ci_high": 0.778195972217519,
+          "mean": 0.7675299430910749
+        },
+        "expected_ms_bert_cpu": 2.6436458178395013,
+        "expected_ms_bert_gpu": 1.4949581409812385
+      }
+    },
+    "[0.3, 0.8]": {
+      "clean": {
+        "escalation_rate": 0.18421932464058843,
+        "n_escalated": 1653,
+        "macro_f1": 0.9060367932105629,
+        "bootstrap_ci": {
+          "ci_low": 0.8984227728699823,
+          "ci_high": 0.9125799086014724,
+          "mean": 0.9059699231331229
+        },
+        "expected_ms_bert_cpu": 4.469817816934835,
+        "expected_ms_bert_gpu": 2.1227464574209804
+      },
+      "leetspeak": {
+        "escalation_rate": 0.1870054608269252,
+        "n_escalated": 1678,
+        "macro_f1": 0.8582186400072058,
+        "bootstrap_ci": {
+          "ci_low": 0.8498545930603365,
+          "ci_high": 0.8663342982126289,
+          "mean": 0.8581164233546698
+        },
+        "expected_ms_bert_cpu": 4.523910589419886,
+        "expected_ms_bert_gpu": 2.14134208290794
+      },
+      "char_insert": {
+        "escalation_rate": 0.1675025075225677,
+        "n_escalated": 1503,
+        "macro_f1": 0.6861068269302746,
+        "bootstrap_ci": {
+          "ci_low": 0.6742022750851541,
+          "ci_high": 0.6984145041753165,
+          "mean": 0.6862393022886665
+        },
+        "expected_ms_bert_cpu": 4.145261182024527,
+        "expected_ms_bert_gpu": 2.0111727044992254
+      },
+      "whitespace": {
+        "escalation_rate": 0.16783684386492811,
+        "n_escalated": 1506,
+        "macro_f1": 0.6906706847940963,
+        "bootstrap_ci": {
+          "ci_low": 0.6786345847594921,
+          "ci_high": 0.7034252384960459,
+          "mean": 0.6907995556248243
+        },
+        "expected_ms_bert_cpu": 4.151752314722733,
+        "expected_ms_bert_gpu": 2.0134041795576607
+      },
+      "swap": {
+        "escalation_rate": 0.18756268806419257,
+        "n_escalated": 1683,
+        "macro_f1": 0.774971575314138,
+        "bootstrap_ci": {
+          "ci_low": 0.7649610638058573,
+          "ci_high": 0.785509352887122,
+          "mean": 0.7750195695194259
+        },
+        "expected_ms_bert_cpu": 4.534729143916897,
+        "expected_ms_bert_gpu": 2.1450612080053317
+      }
+    },
+    "[0.2, 0.9]": {
+      "clean": {
+        "escalation_rate": 0.4699654519112894,
+        "n_escalated": 4217,
+        "macro_f1": 0.9109130697811962,
+        "bootstrap_ci": {
+          "ci_low": 0.9036628405166056,
+          "ci_high": 0.9173451650138373,
+          "mean": 0.9108724815387609
+        },
+        "expected_ms_bert_cpu": 10.017572563001702,
+        "expected_ms_bert_gpu": 4.029913807363515
+      },
+      "leetspeak": {
+        "escalation_rate": 0.479326869497381,
+        "n_escalated": 4301,
+        "macro_f1": 0.8510304460560603,
+        "bootstrap_ci": {
+          "ci_low": 0.8420722201168038,
+          "ci_high": 0.8591900162804449,
+          "mean": 0.8509337176204286
+        },
+        "expected_ms_bert_cpu": 10.199324278551474,
+        "expected_ms_bert_gpu": 4.092395108999698
+      },
+      "char_insert": {
+        "escalation_rate": 0.5130948400757829,
+        "n_escalated": 4604,
+        "macro_f1": 0.7020133039220857,
+        "bootstrap_ci": {
+          "ci_low": 0.6905545759320116,
+          "ci_high": 0.7139013770901856,
+          "mean": 0.702081660195773
+        },
+        "expected_ms_bert_cpu": 10.854928681070296,
+        "expected_ms_bert_gpu": 4.3177740899016435
+      },
+      "whitespace": {
+        "escalation_rate": 0.5144321854452245,
+        "n_escalated": 4616,
+        "macro_f1": 0.7236387966641465,
+        "bootstrap_ci": {
+          "ci_low": 0.7127570039874469,
+          "ci_high": 0.7353618550381608,
+          "mean": 0.7237001262293584
+        },
+        "expected_ms_bert_cpu": 10.880893211863121,
+        "expected_ms_bert_gpu": 4.326699990135383
+      },
+      "swap": {
+        "escalation_rate": 0.5013930680931684,
+        "n_escalated": 4499,
+        "macro_f1": 0.8103362324481781,
+        "bootstrap_ci": {
+          "ci_low": 0.8006234122919168,
+          "ci_high": 0.820521612394229,
+          "mean": 0.8103667892438948
+        },
+        "expected_ms_bert_cpu": 10.627739036633082,
+        "expected_ms_bert_gpu": 4.239672462856415
+      }
+    }
+  },
+  "reference_no_cascade": {
+    "clean": {
+      "LR_only_macro_f1": 0.8911076860432896,
+      "DistilBERT_only_macro_f1": 0.9120873900512967
+    },
+    "leetspeak": {
+      "LR_only_macro_f1": 0.8632948920620588,
+      "DistilBERT_only_macro_f1": 0.8165536445455746
+    },
+    "char_insert": {
+      "LR_only_macro_f1": 0.6916586845156195,
+      "DistilBERT_only_macro_f1": 0.7050136862851788
+    },
+    "whitespace": {
+      "LR_only_macro_f1": 0.6921388504175049,
+      "DistilBERT_only_macro_f1": 0.7308555765187156
+    },
+    "swap": {
+      "LR_only_macro_f1": 0.7698408368333829,
+      "DistilBERT_only_macro_f1": 0.8227312819908618
+    }
+  }
+}
