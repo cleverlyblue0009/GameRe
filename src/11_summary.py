@@ -131,16 +131,79 @@ def main():
     # ---------------------------------------------------------------- provenance
     A("## 0. Provenance of the comparison column")
     A("")
-    A("The only artefact that survived deletion was a single memory note "
-      "recording dataset decisions and split sizes. **No metric values, "
-      "hyperparameters, latencies or adversarial results survived.** The "
-      "old-vs-new columns below are therefore populated for the splits and "
-      "label mapping, and read *not recorded* for everything else.")
+    A("The original project and its transcripts were deleted; the only "
+      "surviving artefact was one memory note. The old values below come "
+      "instead from the paper PDF (*When Does TF-IDF Suffice?*, Bhaumik & "
+      "Berlin M. A.), transcribed into `results/old_paper.json`. Old "
+      "hyperparameter values were never reported in the paper and remain "
+      "*not recorded*.")
     A("")
-    A("If you still hold the old draft, fill in `results/old_paper.json` and "
-      "re-run `python src/11_summary.py`; the comparison columns and the flip "
-      "detection populate automatically.")
-    A("")
+
+    # ------------------------------------------------- methodology discrepancies
+    disc = old.get("_methodology_discrepancies")
+    if disc:
+        A("## 0.1 Errors in the paper's methodology section — fix before "
+          "camera-ready")
+        A("")
+        A("Two of the paper's Section IV descriptions contradict the paper's "
+          "own reported numbers. Both were found by trying to reproduce the "
+          "numbers from the described procedure, and both are the kind of "
+          "thing a reviewer can check in minutes.")
+        A("")
+
+        d = disc.get("label_collapse_rule")
+        if d:
+            A("### (a) The stated label-collapse rule cannot produce the "
+              "paper's own counts")
+            A("")
+            A("- **Paper says** — {}".format(d["paper_says"]))
+            A("- **That rule actually yields** — {} toxic / {} non-toxic".format(
+                d["that_rule_actually_yields"]["toxic"],
+                d["that_rule_actually_yields"]["non_toxic"]))
+            A("- **Paper reports** — {} toxic / {} non-toxic".format(
+                d["paper_reports"]["toxic"], d["paper_reports"]["non_toxic"]))
+            A("- **Rule that does reproduce those counts** — "
+              "`{}`".format(d["rule_that_reproduces_paper_counts"]))
+            A("")
+            A("{}".format(d["verdict"]))
+            A("")
+
+        d = disc.get("split_protocol")
+        if d:
+            A("### (b) The stated split is arithmetically impossible")
+            A("")
+            A("- **Paper says** — {}".format(d["paper_says"]))
+            ac = d["actual_corpus"]
+            A("- **Actual corpus** — `CONDA_train.csv` {:,} rows, "
+              "`CONDA_valid.csv` {:,}, `CONDA_test.csv` {:,} (unlabelled); "
+              "{:,} rows in total, {:,} labelled.".format(
+                  ac["CONDA_train.csv"], ac["CONDA_valid.csv"],
+                  ac["CONDA_test.csv_unlabelled"], ac["total"],
+                  ac["total_labelled"]))
+            A("")
+            A("{}".format(d["verdict"]))
+            A("")
+            A("{}".format(d["also_note"]))
+            A("")
+
+        d = disc.get("distilbert_latency_iterations")
+        if d:
+            A("### (c) DistilBERT's old latency rests on 10× fewer samples")
+            A("")
+            A("- **Paper says** — {}".format(d["paper_says"]))
+            A("- **This rebuild** — {}".format(d["this_rebuild"]))
+            A("")
+            A("{}".format(d["verdict"]))
+            A("")
+
+        d = disc.get("fig4_axis")
+        if d:
+            A("### (d) Figure 4's axis")
+            A("")
+            A("- **Paper says** — {}".format(d["paper_says"]))
+            A("- **Observed** — {}".format(d["observed"]))
+            A("- **This rebuild** — {}".format(d["this_rebuild"]))
+            A("")
 
     if env:
         A("## 1. Environment")
@@ -195,7 +258,18 @@ def main():
     A("| `O` neutral | 6,628 | 3.7% |")
     A("")
     A("`A` behaves like the neutral class, not like `E`. Including it inflates "
-      "the toxic class by 33% (580 / 1,765) with largely non-toxic content. "
+      "the toxic class by 33% (580 / 1,765) with largely non-toxic content.")
+    A("")
+    A("**The paper already noticed this**, in Sec V-F: *\"The high toxic-class "
+      "weight on report and commend reveals an annotation artifact worth "
+      "flagging: utterances calling on others to report a teammate are "
+      "themselves frequently labeled toxic, so the model partially encodes "
+      "the social act of group reporting rather than only lexical content.\"* "
+      "What the paper treats as an interesting quirk of the LR coefficients "
+      "is in fact a property of the label definition itself, affecting 580 "
+      "test utterances — a quarter of the positive class. The sensitivity "
+      "analysis in §11 is what turns that observation into a quantified "
+      "threat-to-validity. "
       "The mapping is kept as the primary one because it is the one that "
       "reproduces the original counts, but every split also carries a "
       "`label_EI` column (`toxic = intentClass ∈ {E, I}`) so the sensitivity "
@@ -335,17 +409,25 @@ def main():
         A("`{}`. Rule: {}.".format(d05["mcnemar"]["library"],
                                    d05["mcnemar"]["rule"]))
         A("")
-        A("| pair | discordant (b, c) | test used | statistic | p-value | "
-          "significant (α=0.05) |")
-        A("|---|---|---|---|---|---|")
+        omc = old.get("mcnemar_pvalues", {})
+        A("| pair | discordant (b, c) | test used | statistic | p-value (new) "
+          "| p-value (old) | significant (α=0.05) |")
+        A("|---|---|---|---|---|---|---|")
         for pair, r in d05["mcnemar"]["pairs"].items():
             t = r["table"]
-            A("| {} | {} ({}, {}) | {} | {} | {:.3e} | {} |".format(
+            op = omc.get(pair)
+            A("| {} | {} ({}, {}) | {} | {} | {:.3e} | {} | {} |".format(
                 pair, r["discordant"], t["only_A_correct"],
                 t["only_B_correct"], r["test"],
                 "n/a" if r["statistic"] is None
                 else "{:.3f}".format(r["statistic"]),
-                r["pvalue"], "**yes**" if r["significant_at_0.05"] else "no"))
+                r["pvalue"],
+                NR if op is None else "{:.1e}".format(op),
+                "**yes**" if r["significant_at_0.05"] else "no"))
+        A("")
+        A("The paper reported all six pairs significant at α = 0.01. Any pair "
+          "above that is *not* significant is a genuine disagreement with the "
+          "old result, not a presentation difference.")
         A("")
 
     # ---------------------------------------------------------------- adversarial

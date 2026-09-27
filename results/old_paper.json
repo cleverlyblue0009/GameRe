@@ -1,19 +1,46 @@
 {
   "_README": [
-    "Known values from the ORIGINAL (deleted) study, for side-by-side comparison",
-    "in results/SUMMARY.md. Script 11 reads this file; anything set to null is",
-    "reported as 'not recorded' rather than guessed.",
+    "Values from the ORIGINAL paper: 'When Does TF-IDF Suffice? A Joint Study of",
+    "Accuracy, Adversarial Robustness, and Inference Latency for Toxicity",
+    "Detection in Multiplayer Game Chat' (Bhaumik & Berlin M. A., EDIGE 2026",
+    "submission), transcribed from EDIGE2026_paper_New.pdf.",
     "",
-    "PROVENANCE: the original project directory and its Claude Code transcripts",
-    "were deleted. The only surviving artefact was one memory note at",
-    ".claude/projects/c--Users-UPASANA-GameRe/memory/project_toxicity_study.md,",
-    "which recorded the dataset decisions and split sizes but NO metric values.",
+    "Script 11 reads this file to build the old-vs-new columns and the flip",
+    "check in results/SUMMARY.md. Anything null is reported as 'not recorded'.",
     "",
-    "TO FILL THIS IN: if you still have the old paper draft, a results PDF, a",
-    "spreadsheet or an old log, put the numbers here and re-run",
-    "'python src/11_summary.py'. The old-vs-new columns and the flip detection",
-    "will populate automatically. Do not edit numbers anywhere else."
+    "NOTE: two of the paper's Section IV methodology descriptions are",
+    "inconsistent with its own reported numbers. See _methodology_discrepancies",
+    "below. The values transcribed here are the paper's RESULTS, which are",
+    "self-consistent; the prose describing how they were obtained is not."
   ],
+
+  "_methodology_discrepancies": {
+    "label_collapse_rule": {
+      "paper_says": "Sec IV-A: 'any utterance whose token-level annotation contains a non-O (non-background) tag is mapped to toxic'",
+      "that_rule_actually_yields": {"toxic": 6084, "non_toxic": 2889},
+      "paper_reports": {"toxic": 2345, "non_toxic": 6628},
+      "rule_that_reproduces_paper_counts": "utterance-level: intentClass != 'O' (E+A+I)",
+      "verdict": "The paper's stated collapse rule is token-level and contradicts its own counts. The code must have used the utterance-level rule. Section IV-A needs correcting."
+    },
+    "split_protocol": {
+      "paper_says": "Sec IV-B: 'approximately 59,820 utterances ... partition it 70/15/15 into train (41,874), validation (8,973), and test (8,973)'",
+      "actual_corpus": {"CONDA_train.csv": 26921, "CONDA_valid.csv": 8974,
+                        "CONDA_test.csv_unlabelled": 8974, "total": 44869,
+                        "total_labelled": 35895},
+      "verdict": "A 41,874-row train split is impossible: CONDA_train.csv has 26,921 rows, and the entire corpus is 44,869 rows, not 59,820. However the paper's test split (8,973 rows, 6,628/2,345) matches CONDA_valid.csv exactly, so the actual protocol was almost certainly CONDA_train.csv -> 80/20 -> train/val with CONDA_valid.csv as test (train 21,531 / val 5,383), which is what the surviving memory note records and what this rebuild implements. Section IV-B needs correcting.",
+      "also_note": "CONDA_test.csv is unlabelled (no intentClass), so it cannot have contributed to any scored split."
+    },
+    "distilbert_latency_iterations": {
+      "paper_says": "Sec III-G: 'DistilBERT uses 100 timed predictions due to its higher per-example cost'",
+      "this_rebuild": "1000 timed predictions for every model including DistilBERT",
+      "verdict": "Not an error, but the old DistilBERT latency figures rest on 10x fewer samples than the others, so their tail percentiles (p95/p99) are far less stable."
+    },
+    "fig4_axis": {
+      "paper_says": "Fig 4 caption: 'Note the log-scale-friendly spread on the x-axis'",
+      "observed": "the plotted x-axis is linear (0-80 ms, evenly spaced)",
+      "this_rebuild": "x-axis is genuinely log-scaled"
+    }
+  },
 
   "splits": {
     "train_n": 21531,
@@ -22,32 +49,46 @@
     "test_toxic": 2345,
     "test_non_toxic": 6628,
     "test_toxic_pct": 26.1,
-    "_source": "memory note (project_toxicity_study.md)"
+    "_source": "test counts from paper Sec IV-B; train/val from the surviving memory note, since the paper's stated 41,874/8,973 is arithmetically impossible"
   },
 
   "label_mapping": {
     "rule": "toxic = intentClass != 'O'  (E + A + I)",
-    "_source": "inferred: it is the unique mapping reproducing 2345/6628"
+    "_source": "inferred: the unique mapping reproducing the paper's 2345/6628"
   },
 
   "metrics": {
-    "_note": "NOT RECORDED - no metric values survived the deletion.",
-    "LR": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
-           "roc_auc": null, "pr_auc": null, "recall_toxic": null,
-           "false_positives": null},
-    "NB": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
-           "roc_auc": null, "pr_auc": null, "recall_toxic": null,
-           "false_positives": null},
-    "RF": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
-           "roc_auc": null, "pr_auc": null, "recall_toxic": null,
-           "false_positives": null},
-    "DistilBERT": {"accuracy": null, "macro_f1": null, "weighted_f1": null,
-                   "roc_auc": null, "pr_auc": null, "recall_toxic": null,
-                   "false_positives": null}
+    "_source": "paper Table I, plus Sec V-C for recall and false-positive counts",
+    "LR": {"accuracy": 0.915, "macro_f1": 0.890, "weighted_f1": 0.915,
+           "roc_auc": 0.953, "pr_auc": 0.907, "recall_toxic": 0.840,
+           "false_positives": 389,
+           "macro_f1_ci": [0.883, 0.897]},
+    "NB": {"accuracy": 0.904, "macro_f1": 0.863, "weighted_f1": 0.899,
+           "roc_auc": 0.926, "pr_auc": 0.879, "recall_toxic": 0.689,
+           "false_positives": 134,
+           "macro_f1_ci": [0.854, 0.872]},
+    "RF": {"accuracy": 0.922, "macro_f1": 0.896, "weighted_f1": 0.921,
+           "roc_auc": 0.941, "pr_auc": 0.897, "recall_toxic": 0.798,
+           "false_positives": 225,
+           "macro_f1_ci": [0.889, 0.903]},
+    "DistilBERT": {"accuracy": 0.934, "macro_f1": 0.913, "weighted_f1": 0.934,
+                   "roc_auc": 0.967, "pr_auc": 0.937, "recall_toxic": 0.851,
+                   "false_positives": 241,
+                   "macro_f1_ci": [0.907, 0.920]}
+  },
+
+  "mcnemar_pvalues": {
+    "_source": "paper Table II (two-tailed)",
+    "LR vs NB": 2.5e-4,
+    "LR vs RF": 1.1e-3,
+    "LR vs DistilBERT": 1.2e-14,
+    "NB vs RF": 3.7e-12,
+    "NB vs DistilBERT": 1.9e-26,
+    "RF vs DistilBERT": 8.3e-8
   },
 
   "hyperparameters": {
-    "_note": "NOT RECORDED.",
+    "_note": "The paper does not report the selected values, only the search protocol.",
     "LR_C": null,
     "NB_alpha": null,
     "RF_max_depth": null,
@@ -55,32 +96,55 @@
   },
 
   "adversarial_macro_f1_drop": {
-    "_note": "NOT RECORDED.",
-    "leetspeak": {"LR": null, "NB": null, "RF": null, "DistilBERT": null},
-    "char_insert": {"LR": null, "NB": null, "RF": null, "DistilBERT": null},
-    "whitespace": {"LR": null, "NB": null, "RF": null, "DistilBERT": null},
-    "swap": {"LR": null, "NB": null, "RF": null, "DistilBERT": null}
+    "_source": "paper Table III (absolute drop, reported as negative; stored here as positive magnitudes to match this rebuild's abs_drop convention)",
+    "leetspeak":   {"LR": 0.205, "NB": 0.222, "RF": 0.221, "DistilBERT": 0.170},
+    "char_insert": {"LR": 0.213, "NB": 0.294, "RF": 0.218, "DistilBERT": 0.175},
+    "whitespace":  {"LR": 0.089, "NB": 0.114, "RF": 0.090, "DistilBERT": 0.065},
+    "swap":        {"LR": 0.069, "NB": 0.062, "RF": 0.077, "DistilBERT": 0.049}
   },
 
   "latency_ms": {
-    "_note": "NOT RECORDED. The original study reportedly timed DistilBERT CPU with only 100 iterations; this rebuild uses 1000.",
-    "LR": null, "NB": null, "RF": null,
-    "DistilBERT_cpu": null, "DistilBERT_gpu": null
+    "_source": "paper Table IV, CPU, mean single-example",
+    "_caveat": "DistilBERT timed with only 100 iterations in the original; 1000 here. The paper does not state whether timings are end-to-end or model-only, nor the RF n_jobs setting.",
+    "LR": 0.45, "NB": 0.48, "RF": 51.89,
+    "DistilBERT_cpu": 82.00, "DistilBERT_gpu": null,
+    "p50": {"LR": 0.38, "NB": 0.40, "RF": 52.82, "DistilBERT_cpu": 81.45},
+    "p95": {"LR": 0.79, "NB": 0.89, "RF": 59.93, "DistilBERT_cpu": 86.06},
+    "p99": {"LR": 1.47, "NB": 1.53, "RF": 100.86, "DistilBERT_cpu": 96.26},
+    "throughput_batch32": {"LR": 47827, "NB": 39988, "RF": 565,
+                           "DistilBERT_cpu": 18}
   },
 
   "cascade": {
-    "_note": "NOT RECORDED.",
+    "_source": "paper Sec VI-B (prose only; no table)",
     "default_band": [0.4, 0.7],
-    "escalation_rate": null,
+    "escalation_rate": 0.15,
+    "escalation_rate_is_upper_bound": true,
+    "_claim": "'under 15% of utterances need the transformer pass, cutting average cost by an order of magnitude while keeping most of DistilBERT's advantage on hard cases'",
     "macro_f1": null
   },
 
+  "environment": {
+    "_source": "paper Sec IV-C",
+    "python": "3.12", "sklearn": "1.5", "torch": "2.4",
+    "ram": "16 GB", "gpu": "single consumer NVIDIA GPU",
+    "_note": "This rebuild uses newer libraries (sklearn 1.9.x, torch 2.6.x); version differences are recorded in results/env.json."
+  },
+
   "conclusions": {
-    "_note": "State the old paper's qualitative claims here as true/false/null so flips are detected automatically.",
-    "distilbert_best_on_clean": null,
-    "distilbert_beats_lr_significantly": null,
-    "distilbert_most_robust_to_attacks": null,
+    "_source": "paper abstract, Sec V and Sec VI",
+    "distilbert_best_on_clean": true,
+    "distilbert_beats_lr_significantly": true,
+    "distilbert_most_robust_to_attacks": true,
     "cascade_matches_distilbert_within_ci": null,
-    "rf_njobs_parallel_faster_single_example": null
+    "rf_njobs_parallel_faster_single_example": null,
+    "_claims_in_prose": [
+      "DistilBERT highest macro-F1 0.913, beating LR by 2.4 absolute points (p < 1e-14)",
+      "DistilBERT ~180x slower than LR on CPU (82.0 ms vs 0.45 ms)",
+      "classical classifiers lose up to 29 absolute points; DistilBERT at most 18",
+      "all six pairwise McNemar comparisons significant at alpha = 0.01",
+      "LR and NB saturate a 50 ms budget at over 40,000 messages/s per core",
+      "the toxic-class weight on 'report'/'commend' is an annotation artifact"
+    ]
   }
 }
