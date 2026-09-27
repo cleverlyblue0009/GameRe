@@ -42,13 +42,49 @@ def delta(new, old, nd=4):
     return "{} ({}) [{:+.{}f}]".format(fmt(new, nd), fmt(old, nd), d, nd)
 
 
-def load(name, required=True):
+def load(name, required=True, sfx=""):
+    """Load results/<stem><sfx>.json."""
+    if sfx and name.endswith(".json"):
+        name = name[: -len(".json")] + sfx + ".json"
     p = C.RESULTS / name
     if not p.exists():
         if required:
             print("  MISSING: results/{} - run that script first".format(name))
         return None
     return C.load_json(p)
+
+
+def conclusions_from(d05, d06, d07, d08):
+    """Recompute the qualitative claims from one label set's results."""
+    c = {}
+    if d05:
+        best = max(MODELS, key=lambda m: d05["metrics"][m]["macro_f1"])
+        c["distilbert_best_on_clean"] = (best == "DistilBERT")
+        key = "LR vs DistilBERT"
+        if key in d05["mcnemar"]["pairs"]:
+            r = d05["mcnemar"]["pairs"][key]
+            better = (d05["metrics"]["DistilBERT"]["macro_f1"]
+                      > d05["metrics"]["LR"]["macro_f1"])
+            c["distilbert_beats_lr_significantly"] = bool(
+                r["significant_at_0.05"] and better)
+    if d06:
+        drops = {m: float(np.mean([d06["results"][a]["per_model"][m]["abs_drop"]
+                                   for a in ATTACKS])) for m in MODELS}
+        c["distilbert_most_robust_to_attacks"] = (
+            min(drops, key=drops.get) == "DistilBERT")
+        c["_mean_drops"] = drops
+    if d08 and d05:
+        cc = d08["results"].get("[0.4, 0.7]", {}).get("clean")
+        if cc:
+            bci = d05["bootstrap"]["per_model"]["DistilBERT"]
+            c["cascade_matches_distilbert_within_ci"] = bool(
+                cc["macro_f1"] >= bci["ci_low"])
+    if d07:
+        cl = d07["cpu_classical"]["RF"]
+        c["rf_njobs_parallel_faster_single_example"] = bool(
+            cl["n_jobs=-1"]["end_to_end_single"]["mean_ms"]
+            < cl["n_jobs=1"]["end_to_end_single"]["mean_ms"])
+    return c
 
 
 def main():
@@ -64,6 +100,15 @@ def main():
     d08 = load("08_cascade.json", required=False)
     d09 = load("09_analysis.json", required=False)
     env = load("env.json", required=False)
+
+    # sensitivity run (E + I label definition), if it has been produced
+    e05 = load("05_evaluate.json", required=False, sfx="_ei")
+    e06 = load("06_adversarial.json", required=False, sfx="_ei")
+    e07 = load("07_latency.json", required=False, sfx="_ei")
+    e08 = load("08_cascade.json", required=False, sfx="_ei")
+    e03 = load("03_classical.json", required=False, sfx="_ei")
+    e04 = load("04_distilbert.json", required=False, sfx="_ei")
+    has_ei = e05 is not None
 
     if d01 is None:
         print("cannot build summary without results/01_data.json")
@@ -504,39 +549,130 @@ def main():
                     s["utterance"][:88].replace("|", "\\|")))
             A("")
 
+    # ---------------------------------------------------------------- sensitivity
+    A("## 11. Sensitivity analysis — the `E ∪ I` label definition")
+    A("")
+    if not has_ei:
+        A("_Not yet produced._ Run the whole pipeline again with "
+          "`TOX_LABEL_SET=ei` (scripts 03–10) to populate this section.")
+        A("")
+    else:
+        A("The primary mapping labels CONDA's `A` (action) class toxic because "
+          "that is what reproduces the original counts. This section re-runs "
+          "the entire pipeline — separate TF-IDF fit, separate hyperparameter "
+          "selection, a separately fine-tuned DistilBERT — against "
+          "`toxic = intentClass ∈ {E, I}` (1,765 toxic / 7,208 non-toxic), the "
+          "dataset authors' own definition. Nothing is shared between the two "
+          "runs except the raw text and the splits.")
+        A("")
+        A("### 11.1 Main metrics under both label definitions")
+        A("")
+        A("| model | macro-F1 (primary `E∪A∪I`) | macro-F1 (sensitivity `E∪I`) "
+          "| Δ | recall toxic (primary) | recall toxic (`E∪I`) |")
+        A("|---|---|---|---|---|---|")
+        for m in MODELS:
+            a = d05["metrics"][m]["macro_f1"] if d05 else None
+            b = e05["metrics"][m]["macro_f1"]
+            ra = d05["metrics"][m]["recall_toxic"] if d05 else None
+            rb = e05["metrics"][m]["recall_toxic"]
+            A("| **{}** | {} | {:.4f} | {} | {} | {:.4f} |".format(
+                m, fmt(a), b,
+                "n/a" if a is None else "{:+.4f}".format(b - a),
+                fmt(ra), rb))
+        A("")
+        if e03:
+            A("Selected hyperparameters differ between label sets:")
+            A("")
+            A("| model | primary | sensitivity `E∪I` |")
+            A("|---|---|---|")
+            A("| LR `C` | {} | {} |".format(
+                d03["models"]["LR"]["best_params"]["C"],
+                e03["models"]["LR"]["best_params"]["C"]))
+            A("| NB `alpha` | {} | {} |".format(
+                d03["models"]["NB"]["best_params"]["alpha"],
+                e03["models"]["NB"]["best_params"]["alpha"]))
+            A("| RF `max_depth` | {} | {} |".format(
+                d03["models"]["RF"]["best_params"]["max_depth"],
+                e03["models"]["RF"]["best_params"]["max_depth"]))
+            if d04 and e04:
+                A("| DistilBERT best epoch | {} | {} |".format(
+                    d04["best_epoch"], e04["best_epoch"]))
+            A("")
+        if e06 and d06:
+            A("### 11.2 Adversarial drop under both label definitions")
+            A("")
+            A("| model | " + " | ".join(
+                "`{}` primary / `E∪I`".format(a) for a in ATTACKS) + " |")
+            A("|---" * (len(ATTACKS) + 1) + "|")
+            for m in MODELS:
+                cells = []
+                for a in ATTACKS:
+                    pa = d06["results"][a]["per_model"][m]["abs_drop"]
+                    pb = e06["results"][a]["per_model"][m]["abs_drop"]
+                    cells.append("{:.4f} / {:.4f}".format(pa, pb))
+                A("| **{}** | {} |".format(m, " | ".join(cells)))
+            A("")
+        if e08 and d08:
+            A("### 11.3 Cascade under both label definitions (default band)")
+            A("")
+            A("| variant | escalated (primary) | escalated (`E∪I`) | "
+              "macro-F1 (primary) | macro-F1 (`E∪I`) |")
+            A("|---|---|---|---|---|")
+            pb = d08["results"].get("[0.4, 0.7]", {})
+            eb = e08["results"].get("[0.4, 0.7]", {})
+            for variant in pb:
+                if variant not in eb:
+                    continue
+                A("| {} | {:.2f}% | {:.2f}% | {:.4f} | {:.4f} |".format(
+                    variant, 100 * pb[variant]["escalation_rate"],
+                    100 * eb[variant]["escalation_rate"],
+                    pb[variant]["macro_f1"], eb[variant]["macro_f1"]))
+            A("")
+
     # ---------------------------------------------------------------- conclusions
-    A("## 11. Conclusions and flip check")
+    A("## 12. Conclusions, flip check, and label-definition robustness")
     A("")
     oc = old.get("conclusions", {})
-    concl = {}
-    if d05:
-        best = max(MODELS, key=lambda m: d05["metrics"][m]["macro_f1"])
-        concl["distilbert_best_on_clean"] = (best == "DistilBERT")
-        key = "LR vs DistilBERT"
-        if key in d05["mcnemar"]["pairs"]:
-            r = d05["mcnemar"]["pairs"][key]
-            better = (d05["metrics"]["DistilBERT"]["macro_f1"]
-                      > d05["metrics"]["LR"]["macro_f1"])
-            concl["distilbert_beats_lr_significantly"] = bool(
-                r["significant_at_0.05"] and better)
-    if d06:
-        drops = {m: float(np.mean([d06["results"][a]["per_model"][m]["abs_drop"]
-                                   for a in ATTACKS])) for m in MODELS}
-        most_robust = min(drops, key=drops.get)
-        concl["distilbert_most_robust_to_attacks"] = (most_robust
-                                                      == "DistilBERT")
-    if d08 and d05:
-        c = d08["results"].get("[0.4, 0.7]", {}).get("clean")
-        if c:
-            bci = d05["bootstrap"]["per_model"]["DistilBERT"]
-            concl["cascade_matches_distilbert_within_ci"] = bool(
-                c["macro_f1"] >= bci["ci_low"])
-    if d07:
-        cl = d07["cpu_classical"]["RF"]
-        concl["rf_njobs_parallel_faster_single_example"] = bool(
-            cl["n_jobs=-1"]["end_to_end_single"]["mean_ms"]
-            < cl["n_jobs=1"]["end_to_end_single"]["mean_ms"])
+    concl = conclusions_from(d05, d06, d07, d08)
+    drops = concl.pop("_mean_drops", None)
+    concl_ei = conclusions_from(e05, e06, e07 or d07, e08) if has_ei else {}
+    drops_ei = concl_ei.pop("_mean_drops", None) if concl_ei else None
 
+    if has_ei:
+        A("### 12.1 Does each conclusion survive the label change?")
+        A("")
+        A("A claim that holds under the primary mapping but not under `E∪I` is "
+          "an artefact of labelling the action class toxic, and should not be "
+          "stated unconditionally in the paper.")
+        A("")
+        A("| claim | primary `E∪A∪I` | sensitivity `E∪I` | robust to label "
+          "definition? |")
+        A("|---|---|---|---|")
+        fragile = []
+        for k in concl:
+            if k not in concl_ei:
+                continue
+            same = bool(concl[k]) == bool(concl_ei[k])
+            if not same:
+                fragile.append(k)
+            A("| `{}` | {} | {} | {} |".format(
+                k, concl[k], concl_ei[k],
+                "yes" if same else "**NO — label-dependent**"))
+        A("")
+        if fragile:
+            A("**Label-dependent conclusions — do not state these without the "
+              "caveat:**")
+            A("")
+            for f in fragile:
+                A("- `{}`: `{}` under the primary mapping, `{}` under "
+                  "`E∪I`.".format(f, concl[f], concl_ei[f]))
+            A("")
+        else:
+            A("Every recomputed conclusion survives the label change.")
+            A("")
+
+    A("### 12.2 Against the old paper")
+    A("")
     A("| claim | this rebuild | old paper | status |")
     A("|---|---|---|---|")
     flips = []
@@ -564,25 +700,37 @@ def main():
           "evidence of agreement.")
         A("")
 
-    if d06:
-        A("### Observed ordering (this rebuild)")
+    if drops:
+        A("### 12.3 Observed robustness ordering (this rebuild)")
         A("")
-        A("Mean absolute macro-F1 drop across the four attacks:")
+        A("Mean absolute macro-F1 drop across the four attacks "
+          "(lower = more robust):")
         A("")
-        A("| model | mean drop |")
-        A("|---|---|")
-        for m, v in sorted(drops.items(), key=lambda kv: kv[1]):
-            A("| {} | {:.4f} |".format(m, v))
+        if drops_ei:
+            A("| model | mean drop (primary) | mean drop (`E∪I`) |")
+            A("|---|---|---|")
+            for m, v in sorted(drops.items(), key=lambda kv: kv[1]):
+                A("| {} | {:.4f} | {:.4f} |".format(m, v, drops_ei[m]))
+        else:
+            A("| model | mean drop |")
+            A("|---|---|")
+            for m, v in sorted(drops.items(), key=lambda kv: kv[1]):
+                A("| {} | {:.4f} |".format(m, v))
         A("")
 
-    A("## 12. Open items")
+    A("## 13. Open items")
     A("")
     A("- `results/old_paper.json` is mostly empty: no metric values survived "
-      "the deletion. Fill it in and re-run this script to populate every "
-      "comparison column and the flip check.")
-    A("- The `A`-class caveat (§2.1) is the largest threat to validity in the "
-      "current label definition. The `label_EI` column is already in every "
-      "split if you want the sensitivity run.")
+      "the deletion, so every old-vs-new cell above reads *not recorded*. The "
+      "paper should not imply a comparison that could not be made. Fill the "
+      "file in and re-run this script if the old draft turns up.")
+    if has_ei:
+        A("- The sensitivity run (§11) is complete. Any claim marked "
+          "label-dependent in §12.1 needs the `A`-class caveat stated "
+          "alongside it.")
+    else:
+        A("- The `E∪I` sensitivity run (§11) has not been produced yet: "
+          "`TOX_LABEL_SET=ei` for scripts 03–10.")
     A("- The gaming stopword whitelist (§4) currently changes nothing; either "
       "drop the claim from the paper or widen the stopword list it subtracts "
       "from.")

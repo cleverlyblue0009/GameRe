@@ -107,6 +107,39 @@ independently re-runnable given its predecessors' outputs.
 | 10 | `python src/10_figures.py` | `figures/fig{2,3,4}.{pdf,png}` |
 | — | `python src/11_summary.py` | `results/SUMMARY.md` — every table, paper-ready, with old-vs-new columns |
 
+### The sensitivity run (`E ∪ I`)
+
+Because the primary label definition is contestable (see the `A`-class caveat
+above), the whole pipeline runs a second time against
+`toxic = intentClass ∈ {E, I}`. The label set is chosen by an environment
+variable, and every artefact the second run writes is suffixed `_ei`, so the
+two never collide:
+
+```bash
+# primary run (E ∪ A ∪ I) — the default
+for s in 03_classical 04_distilbert 05_evaluate 06_adversarial \
+         07_latency 08_cascade 09_analysis 10_figures; do
+  python src/$s.py
+done
+
+# sensitivity run (E ∪ I)
+export TOX_LABEL_SET=ei
+for s in 03_classical 04_distilbert 05_evaluate 06_adversarial \
+         07_latency 08_cascade 09_analysis 10_figures; do
+  python src/$s.py
+done
+unset TOX_LABEL_SET
+
+python src/11_summary.py    # reads both, writes one SUMMARY.md
+```
+
+Nothing is shared between the two runs but the raw text and the splits: each
+gets its own TF-IDF fit, its own hyperparameter selection and its own
+fine-tuned DistilBERT. `src/11_summary.py` reads both and reports, per
+conclusion, whether it survives the label change — a claim that holds only
+under the primary mapping is an artefact of labelling the action class toxic
+and is flagged as label-dependent.
+
 Which table comes from where:
 
 - **Main metrics** (accuracy, macro-F1, weighted-F1, ROC-AUC, PR-AUC, toxic

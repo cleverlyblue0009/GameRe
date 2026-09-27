@@ -96,6 +96,7 @@ def time_batch(fn, samples, batch=BATCH, n_warmup=10, n_timed=100):
 
 def main():
     C.set_seed()
+    C.announce_label_set()
     C._stopwords()
     import torch
 
@@ -105,7 +106,7 @@ def main():
     samples = [raw[i] for i in rng.permutation(len(raw))[: max(N_TIMED, 1000)]]
 
     vec, cmodels = P.load_classical()
-    out = {"protocol": {
+    out = {"label_set": C.LABEL_SET, "protocol": {
         "n_warmup": N_WARMUP, "n_timed": N_TIMED, "batch_size": BATCH,
         "clock": "time.perf_counter",
         "primary_metric": "end_to_end",
@@ -300,7 +301,8 @@ def main():
         line("DistilBERT GPU fp32", out["gpu_distilbert"]["fp32"])
         line("DistilBERT GPU fp16", out["gpu_distilbert"]["fp16_autocast"])
 
-    C.save_json(out, C.RESULTS / "07_latency.json", "07_latency")
+    C.save_json(out, C.RESULTS / ("07_latency" + C.suffix() + ".json"),
+                "07_latency" + C.suffix())
 
 
 if __name__ == "__main__":

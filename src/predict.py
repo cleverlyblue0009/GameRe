@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common as C
 
 CLASSICAL_NAMES = ("LR", "NB", "RF")
-BERT_CKPT = C.CKPT / "distilbert_best.pt"
+BERT_CKPT = C.CKPT / ("distilbert_best" + C.suffix() + ".pt")
 
 
 # --------------------------------------------------------------------------
@@ -32,11 +32,12 @@ def load_classical():
     """Return (vectorizer, {name: fitted_model})."""
     import joblib
 
-    vec = joblib.load(C.CKPT / "tfidf_vectorizer.joblib")
+    sfx = C.suffix()
+    vec = joblib.load(C.CKPT / ("tfidf_vectorizer" + sfx + ".joblib"))
     models = {
-        "LR": joblib.load(C.CKPT / "model_lr.joblib"),
-        "NB": joblib.load(C.CKPT / "model_nb.joblib"),
-        "RF": joblib.load(C.CKPT / "model_rf.joblib"),
+        "LR": joblib.load(C.CKPT / ("model_lr" + sfx + ".joblib")),
+        "NB": joblib.load(C.CKPT / ("model_nb" + sfx + ".joblib")),
+        "RF": joblib.load(C.CKPT / ("model_rf" + sfx + ".joblib")),
     }
     return vec, models
 

@@ -113,8 +113,9 @@ def mcnemar_pair(y, pred_a, pred_b):
 
 def main():
     C.set_seed()
+    C.announce_label_set()
     test = pd.read_csv(C.PROC / "test_prep.csv")
-    y = test["label"].values
+    y = test[C.label_col()].values
     raw = test["utterance"].astype(str).tolist()
 
     C.banner("05 - EVALUATE: predictions on the clean test set")
@@ -130,11 +131,11 @@ def main():
     preds = {k: P.to_pred(v) for k, v in probs.items()}
 
     np.savez_compressed(
-        C.CKPT / "test_probs.npz",
+        C.CKPT / ("test_probs" + C.suffix() + ".npz"),
         y=y, ids=test["Id"].values,
         **{k: v for k, v in probs.items()},
     )
-    print("  [saved] checkpoints/test_probs.npz (reused by 08/09)")
+    print("  [saved] checkpoints/test_probs{}.npz (reused by 08/09)".format(C.suffix()))
 
     C.banner("05 - EVALUATE: main metrics (threshold 0.5)")
     rows = {}
@@ -186,6 +187,8 @@ def main():
 
     C.save_json(
         {
+            "label_set": C.LABEL_SET,
+            "label_rule": C.label_rule(),
             "n_test": int(len(y)),
             "threshold": 0.5,
             "metrics": rows,
@@ -203,8 +206,8 @@ def main():
             },
             "device_distilbert": device,
         },
-        C.RESULTS / "05_evaluate.json",
-        "05_evaluate",
+        C.RESULTS / ("05_evaluate" + C.suffix() + ".json"),
+        "05_evaluate" + C.suffix(),
     )
 
 

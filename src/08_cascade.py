@@ -61,7 +61,7 @@ def boot_ci(y, pred, idx_matrix):
 
 def load_latencies():
     """Pull end-to-end single-example means from script 07, if available."""
-    path = C.RESULTS / "07_latency.json"
+    path = C.RESULTS / ("07_latency" + C.suffix() + ".json")
     if not path.exists():
         print("  WARNING: results/07_latency.json missing - latency columns "
               "will be null. Run src/07_latency.py first.")
@@ -83,6 +83,7 @@ def load_latencies():
 
 def main():
     C.set_seed()
+    C.announce_label_set()
     C._stopwords()
     import torch
     from sklearn.metrics import f1_score
@@ -91,7 +92,7 @@ def main():
     adv = __import__("06_adversarial")
 
     test = pd.read_csv(C.PROC / "test_prep.csv")
-    y = test["label"].values
+    y = test[C.label_col()].values
     raw = test["utterance"].astype(str).tolist()
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -165,6 +166,8 @@ def main():
 
     C.save_json(
         {
+            "label_set": C.LABEL_SET,
+            "label_rule": C.label_rule(),
             "bands": [list(b) for b in BANDS],
             "default_band": list(DEFAULT_BAND),
             "rule": ("LR decides unless low <= P_LR(toxic) <= high, in which "
@@ -178,8 +181,8 @@ def main():
             "results": out,
             "reference_no_cascade": ref,
         },
-        C.RESULTS / "08_cascade.json",
-        "08_cascade",
+        C.RESULTS / ("08_cascade" + C.suffix() + ".json"),
+        "08_cascade" + C.suffix(),
     )
 
 

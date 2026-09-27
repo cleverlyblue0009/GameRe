@@ -36,7 +36,7 @@ BATCH_SIZE = 32
 LR = 2e-5
 EPOCHS = 3
 WARMUP_FRAC = 0.10
-CKPT_PATH = C.CKPT / "distilbert_best.pt"
+CKPT_PATH = C.CKPT / ("distilbert_best" + C.suffix() + ".pt")
 
 
 def build_model(device):
@@ -71,7 +71,7 @@ def make_loader(df, tok, shuffle, batch_size=BATCH_SIZE, generator=None):
     )
     ds = TensorDataset(
         enc["input_ids"], enc["attention_mask"],
-        torch.tensor(df["label"].values, dtype=torch.long),
+        torch.tensor(df[C.label_col()].values, dtype=torch.long),
     )
     return DataLoader(ds, batch_size=batch_size, shuffle=shuffle,
                       generator=generator, num_workers=0)
@@ -116,6 +116,7 @@ def main():
     print("  device : {}".format(torch.cuda.get_device_name(0)))
     print("  torch  : {}  (cuda {})".format(torch.__version__, torch.version.cuda))
 
+    C.announce_label_set()
     C.set_seed()
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
@@ -228,6 +229,8 @@ def main():
                 "total_steps": total_steps, "grad_clip": 1.0, "seed": C.SEED,
                 "scheduler": "linear decay after linear warmup",
             },
+            "label_set": C.LABEL_SET,
+            "label_rule": C.label_rule(),
             "params_total": n_params,
             "history": history,
             "best_epoch": best_epoch,
@@ -243,8 +246,8 @@ def main():
             "device": torch.cuda.get_device_name(0),
             "checkpoint": str(CKPT_PATH.relative_to(C.ROOT)),
         },
-        C.RESULTS / "04_distilbert.json",
-        "04_distilbert",
+        C.RESULTS / ("04_distilbert" + C.suffix() + ".json"),
+        "04_distilbert" + C.suffix(),
     )
 
 

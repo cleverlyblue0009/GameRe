@@ -46,7 +46,11 @@ import predict as P
 
 LEET_ATTACK = {"a": "4", "e": "3", "i": "1", "o": "0", "s": "$", "t": "7"}
 LEET_P = 0.5
-INSERT_CHARS = ".-_*'`~^"
+# Deliberately excludes the apostrophe: it is the one punctuation character the
+# classical pipeline treats specially (kept inside contractions), so including
+# it here would conflate "attack inserted a character" with "pipeline handles
+# this character differently" and muddy the punctuation-OFF ablation.
+INSERT_CHARS = ".-_*`~^"
 N_AUDIT = 20
 MODELS = ("LR", "NB", "RF", "DistilBERT")
 
@@ -158,7 +162,7 @@ def build_attacked(test, attack_name):
     texts, changed = [], 0
     for _, row in test.iterrows():
         raw = str(row["utterance"])
-        if row["label"] == 1:
+        if row[C.label_col()] == 1:
             new = fn(raw, row.get("slotClasses"), rng)
             texts.append(new)
             changed += int(new != raw)
@@ -178,7 +182,7 @@ def audit(test, attack_name, vec, n=N_AUDIT):
     """Show raw -> perturbed -> what the TF-IDF vectoriser actually receives."""
     rng = random.Random(C.SEED)
     fn = ATTACKS[attack_name]
-    tox = test[test["label"] == 1]
+    tox = test[test[C.label_col()] == 1]
     rows = []
     print("\n  --- audit: {} (first {} toxic test items) ---".format(attack_name, n))
     shown = 0
@@ -210,11 +214,12 @@ def audit(test, attack_name, vec, n=N_AUDIT):
 
 def main():
     C.set_seed()
+    C.announce_label_set()
     C._stopwords()
     import torch
 
     test = pd.read_csv(C.PROC / "test_prep.csv")
-    y = test["label"].values
+    y = test[C.label_col()].values
     raw = test["utterance"].astype(str).tolist()
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -311,6 +316,8 @@ def main():
                 "macro-F1 computed over the full test set."
             ),
             "seed": C.SEED,
+            "label_set": C.LABEL_SET,
+            "label_rule": C.label_rule(),
             "attacks": {
                 "leetspeak": "per char of candidate tokens, p=0.5: "
                              "a->4 e->3 i->1 o->0 s->$ t->7",
@@ -334,8 +341,8 @@ def main():
             "audit_samples": audits,
             "n_audit_per_attack": N_AUDIT,
         },
-        C.RESULTS / "06_adversarial.json",
-        "06_adversarial",
+        C.RESULTS / ("06_adversarial" + C.suffix() + ".json"),
+        "06_adversarial" + C.suffix(),
     )
 
 

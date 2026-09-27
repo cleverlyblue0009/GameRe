@@ -61,6 +61,52 @@ def label_ei(intent: "str") -> int:
 
 
 # --------------------------------------------------------------------------
+# which label definition is this run using?
+# --------------------------------------------------------------------------
+# Selected by the TOX_LABEL_SET environment variable so that a whole pipeline
+# can be run twice without editing code:
+#
+#   python src/03_classical.py                      -> primary  (E + A + I)
+#   TOX_LABEL_SET=ei python src/03_classical.py     -> sensitivity (E + I)
+#
+# Every artefact the sensitivity run writes is suffixed "_ei", so the two runs
+# never overwrite each other.
+LABEL_SETS = {
+    "primary": {"column": "label", "suffix": "",
+                "rule": "toxic = intentClass != 'O'  (E + A + I)"},
+    "ei": {"column": "label_EI", "suffix": "_ei",
+           "rule": "toxic = intentClass in {E, I}"},
+}
+
+LABEL_SET = os.environ.get("TOX_LABEL_SET", "primary").strip().lower()
+if LABEL_SET not in LABEL_SETS:
+    raise SystemExit(
+        "TOX_LABEL_SET must be one of {}, got {!r}".format(
+            sorted(LABEL_SETS), LABEL_SET)
+    )
+
+
+def label_col() -> str:
+    """Name of the label column this run should train/evaluate against."""
+    return LABEL_SETS[LABEL_SET]["column"]
+
+
+def suffix() -> str:
+    """Filename suffix keeping the two label runs' artefacts apart."""
+    return LABEL_SETS[LABEL_SET]["suffix"]
+
+
+def label_rule() -> str:
+    return LABEL_SETS[LABEL_SET]["rule"]
+
+
+def announce_label_set() -> None:
+    print("label set : {}   ({})".format(LABEL_SET, label_rule()))
+    print("label col : {}   artefact suffix: {!r}".format(
+        label_col(), suffix()))
+
+
+# --------------------------------------------------------------------------
 # seeding
 # --------------------------------------------------------------------------
 def set_seed(seed: int = SEED) -> None:

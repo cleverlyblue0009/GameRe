@@ -51,6 +51,7 @@ def load(split):
 
 def main():
     C.set_seed()
+    C.announce_label_set()
     import joblib
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -60,8 +61,8 @@ def main():
     from sklearn.naive_bayes import MultinomialNB
 
     train, val = load("train"), load("val")
-    Xtr_txt, ytr = train["text_classical"].values, train["label"].values
-    Xva_txt, yva = val["text_classical"].values, val["label"].values
+    Xtr_txt, ytr = train["text_classical"].values, train[C.label_col()].values
+    Xva_txt, yva = val["text_classical"].values, val[C.label_col()].values
 
     C.banner("03 - CLASSICAL: TF-IDF vectoriser (fit on TRAIN only)")
     t0 = time.perf_counter()
@@ -190,12 +191,13 @@ def main():
 
     # ---------------------------------------------------------------- save
     C.banner("03 - CLASSICAL: saving fitted pipelines")
-    joblib.dump(vec, C.CKPT / "tfidf_vectorizer.joblib")
-    joblib.dump(lr, C.CKPT / "model_lr.joblib")
-    joblib.dump(nb, C.CKPT / "model_nb.joblib")
-    joblib.dump(rf, C.CKPT / "model_rf.joblib")
+    sfx = C.suffix()
+    joblib.dump(vec, C.CKPT / ("tfidf_vectorizer" + sfx + ".joblib"))
+    joblib.dump(lr, C.CKPT / ("model_lr" + sfx + ".joblib"))
+    joblib.dump(nb, C.CKPT / ("model_nb" + sfx + ".joblib"))
+    joblib.dump(rf, C.CKPT / ("model_rf" + sfx + ".joblib"))
     for f in ("tfidf_vectorizer", "model_lr", "model_nb", "model_rf"):
-        p = C.CKPT / (f + ".joblib")
+        p = C.CKPT / (f + sfx + ".joblib")
         print("  [saved] {}  ({:.1f} MB)".format(
             p.name, p.stat().st_size / 1024 ** 2))
 
@@ -214,13 +216,15 @@ def main():
             "cv": {"n_splits": 5, "shuffle": True, "random_state": C.SEED,
                    "scoring": "f1_macro"},
             "models": results,
+            "label_set": C.LABEL_SET,
+            "label_rule": C.label_rule(),
             "protocol_note": (
                 "No hyperparameter was selected using the test split. LR and RF "
                 "use 5-fold stratified CV on train; NB alpha uses the val split."
             ),
         },
-        C.RESULTS / "03_classical.json",
-        "03_classical",
+        C.RESULTS / ("03_classical" + C.suffix() + ".json"),
+        "03_classical" + C.suffix(),
     )
 
 

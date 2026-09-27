@@ -102,7 +102,7 @@ def lr_coefficients(vec, lr, smap):
 
 def error_analysis(test, probs, model_name):
     """Highest-confidence FPs and FNs, printed in full."""
-    y = test["label"].values
+    y = test[C.label_col()].values
     p = np.asarray(probs)
     pred = (p >= 0.5).astype(int)
 
@@ -164,6 +164,7 @@ def error_analysis(test, probs, model_name):
 
 def main():
     C.set_seed()
+    C.announce_label_set()
     C._stopwords()
 
     train = pd.read_csv(C.PROC / "train_prep.csv")
@@ -175,7 +176,7 @@ def main():
     coefs = lr_coefficients(vec, cmodels["LR"], smap)
 
     # reuse the cached probabilities from script 05 when available
-    cache = C.CKPT / "test_probs.npz"
+    cache = C.CKPT / ("test_probs" + C.suffix() + ".npz")
     if cache.exists():
         z = np.load(cache, allow_pickle=False)
         probs = {k: z[k] for k in z.files if k not in ("y", "ids")}
@@ -196,6 +197,7 @@ def main():
 
     C.save_json(
         {
+            "label_set": C.LABEL_SET,
             "top_k": TOP_K,
             "n_errors_per_class": N_ERRORS,
             "lr_coefficients": coefs,
@@ -206,8 +208,8 @@ def main():
                 "side of the 0.5 threshold."
             ),
         },
-        C.RESULTS / "09_analysis.json",
-        "09_analysis",
+        C.RESULTS / ("09_analysis" + C.suffix() + ".json"),
+        "09_analysis" + C.suffix(),
     )
 
 

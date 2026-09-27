@@ -51,6 +51,7 @@ def viridis(n):
 
 
 def save(fig, stem):
+    stem = stem + C.suffix()
     pdf = C.FIGURES / (stem + ".pdf")
     png = C.FIGURES / (stem + ".png")
     fig.savefig(pdf)
@@ -153,10 +154,12 @@ def fig4(ev, lat, casc):
 
 def main():
     C.banner("10 - FIGURES")
+    C.announce_label_set()
+    sfx = C.suffix()
     need = {
-        "05_evaluate.json": "script 05",
-        "06_adversarial.json": "script 06",
-        "07_latency.json": "script 07",
+        "05_evaluate{}.json".format(sfx): "script 05",
+        "06_adversarial{}.json".format(sfx): "script 06",
+        "07_latency{}.json".format(sfx): "script 07",
     }
     missing = [f for f in need if not (C.RESULTS / f).exists()]
     if missing:
@@ -164,10 +167,10 @@ def main():
         print("  run the corresponding scripts first.")
         sys.exit(1)
 
-    ev = C.load_json(C.RESULTS / "05_evaluate.json")
-    adv = C.load_json(C.RESULTS / "06_adversarial.json")
-    lat = C.load_json(C.RESULTS / "07_latency.json")
-    casc_path = C.RESULTS / "08_cascade.json"
+    ev = C.load_json(C.RESULTS / "05_evaluate{}.json".format(sfx))
+    adv = C.load_json(C.RESULTS / "06_adversarial{}.json".format(sfx))
+    lat = C.load_json(C.RESULTS / "07_latency{}.json".format(sfx))
+    casc_path = C.RESULTS / "08_cascade{}.json".format(sfx)
     casc = C.load_json(casc_path) if casc_path.exists() else None
     if casc is None:
         print("  note: 08_cascade.json absent - Fig 4 omits the cascade point")
