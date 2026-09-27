@@ -641,11 +641,21 @@ def main():
     else:
         A("The primary mapping labels CONDA's `A` (action) class toxic because "
           "that is what reproduces the original counts. This section re-runs "
-          "the entire pipeline — separate TF-IDF fit, separate hyperparameter "
-          "selection, a separately fine-tuned DistilBERT — against "
-          "`toxic = intentClass ∈ {E, I}` (1,765 toxic / 7,208 non-toxic), the "
-          "dataset authors' own definition. Nothing is shared between the two "
-          "runs except the raw text and the splits.")
+          "the pipeline against `toxic = intentClass ∈ {E, I}` "
+          "(1,765 toxic / 7,208 non-toxic), the dataset authors' own "
+          "definition, with its own TF-IDF fit, its own hyperparameter "
+          "selection and its own fine-tuned DistilBERT. Nothing is shared "
+          "between the two runs except the raw text and the splits.")
+        A("")
+        A("**Scope.** The sensitivity run covers clean metrics (§11.1) and "
+          "adversarial degradation (§11.2). Latency, the cascade, the "
+          "preprocessing ablation and the figures were deliberately **not** "
+          "re-run under `E∪I`: they are properties of the pipeline and the "
+          "hardware, not of the label definition, and re-running them would "
+          "produce the same numbers at significant cost. Consequently the "
+          "label-robustness check in §12.1 covers only the claims that were "
+          "actually recomputed; claims resting on latency or the cascade are "
+          "omitted there rather than assumed to survive.")
         A("")
         A("### 11.1 Main metrics under both label definitions")
         A("")
@@ -717,7 +727,9 @@ def main():
     oc = old.get("conclusions", {})
     concl = conclusions_from(d05, d06, d07, d08)
     drops = concl.pop("_mean_drops", None)
-    concl_ei = conclusions_from(e05, e06, e07 or d07, e08) if has_ei else {}
+    # e07/e08 are deliberately NOT back-filled from the primary run: a claim
+    # that was never recomputed under E+I must not be reported as surviving it.
+    concl_ei = conclusions_from(e05, e06, e07, e08) if has_ei else {}
     drops_ei = concl_ei.pop("_mean_drops", None) if concl_ei else None
 
     if has_ei:

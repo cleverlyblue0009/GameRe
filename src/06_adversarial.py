@@ -349,7 +349,12 @@ def main():
             "clean_macro_f1": clean_f1,
             "results": results,
             "ablation": abl,
+            "ablation_skipped": SKIP_ABLATION,
             "ablation_note": (
+                "SKIPPED for this run (TOX_SKIP_ABLATION set): the ablation "
+                "depends on the preprocessing pipeline, not the label "
+                "definition, so it is reported once from the primary run."
+                if SKIP_ABLATION else
                 "Models trained with the full pipeline; only inference-time "
                 "preprocessing is ablated."
             ),
