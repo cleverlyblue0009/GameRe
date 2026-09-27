@@ -1,0 +1,117 @@
+{
+  "tfidf": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "max_features": 20000,
+    "sublinear_tf": true,
+    "min_df": 2,
+    "fitted_on": "train split only",
+    "vocab_size": 5035,
+    "n_unigrams": 2575,
+    "n_bigrams": 2460,
+    "fit_seconds": 0.33
+  },
+  "train_n_jobs": -1,
+  "cv": {
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "scoring": "f1_macro"
+  },
+  "models": {
+    "LR": {
+      "best_params": {
+        "C": 1.0
+      },
+      "selection": "5-fold stratified CV on train, macro-F1",
+      "grid": [
+        0.01,
+        0.1,
+        0.5,
+        1.0,
+        2.0,
+        5.0,
+        10.0
+      ],
+      "cv_scores": {
+        "0.01": 0.8460936075383098,
+        "0.1": 0.8792323078632297,
+        "0.5": 0.889572821848347,
+        "1.0": 0.8908052802149689,
+        "2.0": 0.8906290831978758,
+        "5.0": 0.884244679032823,
+        "10.0": 0.8803941043171752
+      },
+      "cv_best_score": 0.8908052802149689,
+      "val_macro_f1": 0.8871211854525132,
+      "train_seconds": 9.33,
+      "n_jobs": -1,
+      "fixed": {
+        "penalty": "l2",
+        "solver": "lbfgs",
+        "class_weight": "balanced",
+        "max_iter": 2000
+      }
+    },
+    "NB": {
+      "best_params": {
+        "alpha": 0.05
+      },
+      "selection": "val split, macro-F1",
+      "grid": [
+        0.01,
+        0.05,
+        0.1,
+        0.25,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "val_scores": {
+        "0.01": 0.8572609861937567,
+        "0.05": 0.8582070809167114,
+        "0.1": 0.8558663282462553,
+        "0.25": 0.8531172000229479,
+        "0.5": 0.8453782078486777,
+        "1.0": 0.8299181071846231,
+        "2.0": 0.800971009396229
+      },
+      "val_macro_f1": 0.8582070809167114,
+      "train_seconds": 0.05
+    },
+    "RF": {
+      "best_params": {
+        "max_depth": null
+      },
+      "selection": "5-fold stratified CV on train, macro-F1",
+      "grid": [
+        "None",
+        "10",
+        "20",
+        "30",
+        "50"
+      ],
+      "cv_scores": {
+        "None": 0.8924981399055723,
+        "10": 0.8734767616288325,
+        "20": 0.8810053533586327,
+        "30": 0.8835587558723355,
+        "50": 0.8897079996031861
+      },
+      "cv_best_score": 0.8924981399055723,
+      "val_macro_f1": 0.8886226811292097,
+      "train_seconds": 51.02,
+      "n_jobs_train": -1,
+      "fixed": {
+        "n_estimators": 200,
+        "max_features": "sqrt",
+        "class_weight": "balanced"
+      }
+    }
+  },
+  "label_set": "ei",
+  "label_rule": "toxic = intentClass in {E, I}",
+  "protocol_note": "No hyperparameter was selected using the test split. LR and RF use 5-fold stratified CV on train; NB alpha uses the val split."
+}
