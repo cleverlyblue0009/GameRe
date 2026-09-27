@@ -131,13 +131,10 @@ def main():
             lambda t: P.classical_proba([t], vec, mdl), samples)
         s_e2e = stats(e2e)
         show("end-to-end (single)", s_e2e)
-        mo = time_single(
-            lambda t, m=mdl: m.predict_proba(vec.transform([C.preprocess(t, C.CLASSICAL)]))[:, 1],
-            samples)
-        # true model-only: reuse a prebuilt row
+        # model-only: feed rows that are already vectorised, so the timer sees
+        # the classifier alone with no preprocessing or TF-IDF transform
         rows = [X_all[i] for i in range(min(len(samples), N_TIMED))]
-        mo2 = time_single(lambda r, m=mdl: m.predict_proba(r)[:, 1], rows)
-        s_mo = stats(mo2)
+        s_mo = stats(time_single(lambda r, m=mdl: m.predict_proba(r)[:, 1], rows))
         show("model-only (single)", s_mo)
         b_e2e = time_batch(lambda ts: P.classical_proba(ts, vec, mdl), samples)
         print("    batch-{} throughput: {:.1f} ex/s  "
