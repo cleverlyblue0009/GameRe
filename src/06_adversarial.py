@@ -32,8 +32,8 @@ OFF and punctuation stripping OFF to show how much each defence contributes.
 """
 from __future__ import annotations
 
+import os
 import random
-import string
 import sys
 from pathlib import Path
 
@@ -53,6 +53,11 @@ LEET_P = 0.5
 INSERT_CHARS = ".-_*`~^"
 N_AUDIT = 20
 MODELS = ("LR", "NB", "RF", "DistilBERT")
+
+# The preprocessing ablation is a property of the pipeline, not of the label
+# definition, so it only needs running once. Set TOX_SKIP_ABLATION=1 to skip it
+# (used for the E+I sensitivity run, where it would duplicate the primary run).
+SKIP_ABLATION = os.environ.get("TOX_SKIP_ABLATION", "").strip() in ("1", "true", "yes")
 
 
 # --------------------------------------------------------------------------
@@ -212,6 +217,45 @@ def audit(test, attack_name, vec, n=N_AUDIT):
     return rows
 
 
+def run_ablation(y, raw, test, vec, cmodels, abl):
+    C.banner("06 - ADVERSARIAL: ablation (classical defences OFF)")
+    print("  Re-running the classical models with preprocessing steps disabled.")
+    print("  NOTE: the models were TRAINED with the full pipeline; here only the")
+    print("  inference-time preprocessing changes. This isolates the")
+    print("  contribution of each normalisation step as a defence, and the")
+    print("  train/inference mismatch it introduces is itself part of the")
+    print("  finding (reported as the clean-text column).\n")
+
+    ablations = {
+        "full_pipeline": C.CLASSICAL,
+        "leetspeak_OFF": C.PreprocessConfig(
+            True, True, False, True, True, True),
+        "punctuation_OFF": C.PreprocessConfig(
+            True, True, True, False, True, True),
+        "both_OFF": C.PreprocessConfig(
+            True, True, False, False, True, True),
+    }
+    hdr = "{:<18}{:<8}{:>10}".format("config", "model", "clean") + "".join(
+        "{:>14}".format(a) for a in ATTACKS)
+    print(hdr)
+    print("-" * len(hdr))
+    for cfg_name, cfg in ablations.items():
+        abl[cfg_name] = {}
+        for m in ("LR", "NB", "RF"):
+            cf1 = macro_f1(y, P.classical_proba(raw, vec, cmodels[m], cfg))
+            row = {"clean": cf1}
+            cells = []
+            for atk in ATTACKS:
+                texts, _ = build_attacked(test, atk)
+                f1 = macro_f1(y, P.classical_proba(texts, vec, cmodels[m], cfg))
+                row[atk] = {"macro_f1": f1, "abs_drop": cf1 - f1}
+                cells.append("{:.4f} ({:+.3f})".format(f1, f1 - cf1))
+            abl[cfg_name][m] = row
+            print("{:<18}{:<8}{:>10.4f}".format(cfg_name, m, cf1)
+                  + "".join("{:>14}".format(c) for c in cells))
+    return abl
+
+
 def main():
     C.set_seed()
     C.announce_label_set()
@@ -257,43 +301,14 @@ def main():
         audits[atk] = audit(test, atk, vec)
 
     # ---------------------------------------------------------------- ablation
-    C.banner("06 - ADVERSARIAL: ablation (classical defences OFF)")
-    print("  Re-running the classical models with preprocessing steps disabled.")
-    print("  NOTE: the models were TRAINED with the full pipeline; here only the")
-    print("  inference-time preprocessing changes. This isolates the")
-    print("  contribution of each normalisation step as a defence, and the")
-    print("  train/inference mismatch it introduces is itself part of the")
-    print("  finding (reported as the clean-text column).\n")
-
-    ablations = {
-        "full_pipeline": C.CLASSICAL,
-        "leetspeak_OFF": C.PreprocessConfig(
-            True, True, False, True, True, True),
-        "punctuation_OFF": C.PreprocessConfig(
-            True, True, True, False, True, True),
-        "both_OFF": C.PreprocessConfig(
-            True, True, False, False, True, True),
-    }
     abl = {}
-    hdr = "{:<18}{:<8}{:>10}".format("config", "model", "clean") + "".join(
-        "{:>14}".format(a) for a in ATTACKS)
-    print(hdr)
-    print("-" * len(hdr))
-    for cfg_name, cfg in ablations.items():
-        abl[cfg_name] = {}
-        for m in ("LR", "NB", "RF"):
-            cf1 = macro_f1(y, P.classical_proba(raw, vec, cmodels[m], cfg))
-            row = {"clean": cf1}
-            cells = []
-            for atk in ATTACKS:
-                texts, _ = build_attacked(test, atk)
-                f1 = macro_f1(y, P.classical_proba(texts, vec, cmodels[m], cfg))
-                row[atk] = {"macro_f1": f1, "abs_drop": cf1 - f1}
-                cells.append("{:.4f} ({:+.3f})".format(f1, f1 - cf1))
-            abl[cfg_name][m] = row
-            print("{:<18}{:<8}{:>10.4f}".format(cfg_name, m, cf1)
-                  + "".join("{:>14}".format(c) for c in cells))
-
+    if SKIP_ABLATION:
+        C.banner("06 - ADVERSARIAL: ablation SKIPPED")
+        print("  TOX_SKIP_ABLATION set. The preprocessing ablation depends on")
+        print("  the pipeline, not the label definition, so it is reported")
+        print("  once from the primary run (results/06_adversarial.json).")
+    else:
+        run_ablation(y, raw, test, vec, cmodels, abl)
     C.banner("06 - ADVERSARIAL: summary")
     print("{:<14}{:>10}".format("model", "clean") + "".join(
         "{:>13}".format(a) for a in ATTACKS))
