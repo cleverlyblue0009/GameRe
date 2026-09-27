@@ -1,0 +1,22 @@
+{
+  "archive_path": "E:\\conda_tox_backups\\conda_toxicity_checkpoints_20260927_220821.zip",
+  "archive_size_bytes": 541465052,
+  "archive_sha256": "44f53ab30a1e2df8e81504685507bb50b93fdfe9953fff0d53ec682520d537bb",
+  "uncompressed_bytes": 756382877,
+  "n_checkpoint_files": 12,
+  "files": [
+    "distilbert_best.pt",
+    "distilbert_best_ei.pt",
+    "model_lr.joblib",
+    "model_lr_ei.joblib",
+    "model_nb.joblib",
+    "model_nb_ei.joblib",
+    "model_rf.joblib",
+    "model_rf_ei.joblib",
+    "test_probs.npz",
+    "test_probs_ei.npz",
+    "tfidf_vectorizer.joblib",
+    "tfidf_vectorizer_ei.joblib"
+  ],
+  "created": "20260927_220821"
+}
