@@ -1,0 +1,55 @@
+{
+  "config": {
+    "model_name": "distilbert-base-uncased",
+    "head": "single Linear(768->2) on [CLS]",
+    "head_note": "deliberately simpler than HF's default pre_classifier+ReLU+dropout+classifier head",
+    "max_len": 128,
+    "batch_size": 32,
+    "lr": 2e-05,
+    "optimizer": "AdamW",
+    "epochs": 3,
+    "warmup_frac": 0.1,
+    "warmup_steps": 201,
+    "total_steps": 2019,
+    "grad_clip": 1.0,
+    "seed": 42,
+    "scheduler": "linear decay after linear warmup"
+  },
+  "label_set": "ei",
+  "label_rule": "toxic = intentClass in {E, I}",
+  "params_total": 66364418,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.23917,
+      "val_loss": 0.1723,
+      "val_accuracy": 0.93888,
+      "val_macro_f1": 0.89784,
+      "seconds": 167.4
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.13794,
+      "val_loss": 0.17944,
+      "val_accuracy": 0.93981,
+      "val_macro_f1": 0.90409,
+      "seconds": 171.9
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.10146,
+      "val_loss": 0.19989,
+      "val_accuracy": 0.94334,
+      "val_macro_f1": 0.90862,
+      "seconds": 172.7
+    }
+  ],
+  "best_epoch": 3,
+  "best_val_macro_f1": 0.9086233999988312,
+  "early_stopped": false,
+  "early_stopping_note": "Best-on-val checkpoint is kept. With only 3 epochs there is no patience-based abort; 'early_stopped' means the best epoch was not the last.",
+  "total_train_seconds": 553.9,
+  "peak_gpu_mem_gib": 2.03,
+  "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "checkpoint": "checkpoints\\distilbert_best_ei.pt"
+}
