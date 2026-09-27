@@ -1,0 +1,1838 @@
+{
+  "threat_model": "Attacks applied to RAW toxic utterances, then passed through each model's normal preprocessing. Non-toxic rows untouched; macro-F1 computed over the full test set.",
+  "seed": 42,
+  "label_set": "primary",
+  "label_rule": "toxic = intentClass != 'O'  (E + A + I)",
+  "attacks": {
+    "leetspeak": "per char of candidate tokens, p=0.5: a->4 e->3 i->1 o->0 s->$ t->7",
+    "char_insert": "random punctuation from '.-_*`~^' between internal characters",
+    "whitespace": "space between internal characters",
+    "swap": "one adjacent transposition per candidate token"
+  },
+  "candidate_token_rule": "CONDA token-level slot tag in {T, C} when the annotation aligns with the tokens; otherwise alphabetic, len>=3, non-stopword.",
+  "clean_macro_f1": {
+    "LR": 0.8911076860432896,
+    "NB": 0.8529757958042368,
+    "RF": 0.8871817621186382,
+    "DistilBERT": 0.9120873900512967
+  },
+  "results": {
+    "leetspeak": {
+      "n_perturbed": 1616,
+      "per_model": {
+        "LR": {
+          "macro_f1": 0.8632948920620588,
+          "clean_macro_f1": 0.8911076860432896,
+          "abs_drop": 0.02781279398123082,
+          "rel_drop_pct": 3.121148478106572
+        },
+        "NB": {
+          "macro_f1": 0.8235863128399254,
+          "clean_macro_f1": 0.8529757958042368,
+          "abs_drop": 0.02938948296431132,
+          "rel_drop_pct": 3.4455236724039926
+        },
+        "RF": {
+          "macro_f1": 0.8575943704015572,
+          "clean_macro_f1": 0.8871817621186382,
+          "abs_drop": 0.029587391717081024,
+          "rel_drop_pct": 3.3349864684351407
+        },
+        "DistilBERT": {
+          "macro_f1": 0.8165536445455746,
+          "clean_macro_f1": 0.9120873900512967,
+          "abs_drop": 0.09553374550572213,
+          "rel_drop_pct": 10.47418773110647
+        }
+      }
+    },
+    "char_insert": {
+      "n_perturbed": 2017,
+      "per_model": {
+        "LR": {
+          "macro_f1": 0.6916586845156195,
+          "clean_macro_f1": 0.8911076860432896,
+          "abs_drop": 0.1994490015276701,
+          "rel_drop_pct": 22.382143555877818
+        },
+        "NB": {
+          "macro_f1": 0.6682177095847347,
+          "clean_macro_f1": 0.8529757958042368,
+          "abs_drop": 0.18475808621950207,
+          "rel_drop_pct": 21.660413710250836
+        },
+        "RF": {
+          "macro_f1": 0.6820771437592705,
+          "clean_macro_f1": 0.8871817621186382,
+          "abs_drop": 0.20510461835936766,
+          "rel_drop_pct": 23.11866937723863
+        },
+        "DistilBERT": {
+          "macro_f1": 0.7050136862851788,
+          "clean_macro_f1": 0.9120873900512967,
+          "abs_drop": 0.2070737037661179,
+          "rel_drop_pct": 22.70327449154536
+        }
+      }
+    },
+    "whitespace": {
+      "n_perturbed": 2017,
+      "per_model": {
+        "LR": {
+          "macro_f1": 0.6921388504175049,
+          "clean_macro_f1": 0.8911076860432896,
+          "abs_drop": 0.1989688356257847,
+          "rel_drop_pct": 22.328259394692157
+        },
+        "NB": {
+          "macro_f1": 0.669535585266843,
+          "clean_macro_f1": 0.8529757958042368,
+          "abs_drop": 0.1834402105373938,
+          "rel_drop_pct": 21.505910418528973
+        },
+        "RF": {
+          "macro_f1": 0.6820771437592705,
+          "clean_macro_f1": 0.8871817621186382,
+          "abs_drop": 0.20510461835936766,
+          "rel_drop_pct": 23.11866937723863
+        },
+        "DistilBERT": {
+          "macro_f1": 0.7308555765187156,
+          "clean_macro_f1": 0.9120873900512967,
+          "abs_drop": 0.1812318135325811,
+          "rel_drop_pct": 19.870005386478205
+        }
+      }
+    },
+    "swap": {
+      "n_perturbed": 1676,
+      "per_model": {
+        "LR": {
+          "macro_f1": 0.7698408368333829,
+          "clean_macro_f1": 0.8911076860432896,
+          "abs_drop": 0.12126684920990671,
+          "rel_drop_pct": 13.608551593619138
+        },
+        "NB": {
+          "macro_f1": 0.7507523238201259,
+          "clean_macro_f1": 0.8529757958042368,
+          "abs_drop": 0.10222347198411086,
+          "rel_drop_pct": 11.984334430935222
+        },
+        "RF": {
+          "macro_f1": 0.7646705329933033,
+          "clean_macro_f1": 0.8871817621186382,
+          "abs_drop": 0.12251122912533485,
+          "rel_drop_pct": 13.809033769221246
+        },
+        "DistilBERT": {
+          "macro_f1": 0.8227312819908618,
+          "clean_macro_f1": 0.9120873900512967,
+          "abs_drop": 0.08935610806043492,
+          "rel_drop_pct": 9.796880105469876
+        }
+      }
+    }
+  },
+  "ablation": {
+    "full_pipeline": {
+      "LR": {
+        "clean": 0.8911076860432896,
+        "leetspeak": {
+          "macro_f1": 0.8632948920620588,
+          "abs_drop": 0.02781279398123082
+        },
+        "char_insert": {
+          "macro_f1": 0.6916586845156195,
+          "abs_drop": 0.1994490015276701
+        },
+        "whitespace": {
+          "macro_f1": 0.6921388504175049,
+          "abs_drop": 0.1989688356257847
+        },
+        "swap": {
+          "macro_f1": 0.7698408368333829,
+          "abs_drop": 0.12126684920990671
+        }
+      },
+      "NB": {
+        "clean": 0.8529757958042368,
+        "leetspeak": {
+          "macro_f1": 0.8235863128399254,
+          "abs_drop": 0.02938948296431132
+        },
+        "char_insert": {
+          "macro_f1": 0.6682177095847347,
+          "abs_drop": 0.18475808621950207
+        },
+        "whitespace": {
+          "macro_f1": 0.669535585266843,
+          "abs_drop": 0.1834402105373938
+        },
+        "swap": {
+          "macro_f1": 0.7507523238201259,
+          "abs_drop": 0.10222347198411086
+        }
+      },
+      "RF": {
+        "clean": 0.8871817621186382,
+        "leetspeak": {
+          "macro_f1": 0.8575943704015572,
+          "abs_drop": 0.029587391717081024
+        },
+        "char_insert": {
+          "macro_f1": 0.6820771437592705,
+          "abs_drop": 0.20510461835936766
+        },
+        "whitespace": {
+          "macro_f1": 0.6820771437592705,
+          "abs_drop": 0.20510461835936766
+        },
+        "swap": {
+          "macro_f1": 0.7646705329933033,
+          "abs_drop": 0.12251122912533485
+        }
+      }
+    },
+    "leetspeak_OFF": {
+      "LR": {
+        "clean": 0.8910927380594045,
+        "leetspeak": {
+          "macro_f1": 0.7760908313132753,
+          "abs_drop": 0.1150019067461292
+        },
+        "char_insert": {
+          "macro_f1": 0.6888264669163546,
+          "abs_drop": 0.20226627114304985
+        },
+        "whitespace": {
+          "macro_f1": 0.6893122765702572,
+          "abs_drop": 0.2017804614891473
+        },
+        "swap": {
+          "macro_f1": 0.7682645947956175,
+          "abs_drop": 0.12282814326378699
+        }
+      },
+      "NB": {
+        "clean": 0.8538517651717002,
+        "leetspeak": {
+          "macro_f1": 0.7435977613836053,
+          "abs_drop": 0.11025400378809491
+        },
+        "char_insert": {
+          "macro_f1": 0.6674930607607283,
+          "abs_drop": 0.1863587044109719
+        },
+        "whitespace": {
+          "macro_f1": 0.6688171074275171,
+          "abs_drop": 0.18503465774418315
+        },
+        "swap": {
+          "macro_f1": 0.7508279515223754,
+          "abs_drop": 0.10302381364932489
+        }
+      },
+      "RF": {
+        "clean": 0.8874498590415213,
+        "leetspeak": {
+          "macro_f1": 0.7644500676473505,
+          "abs_drop": 0.12299979139417083
+        },
+        "char_insert": {
+          "macro_f1": 0.6798074732273047,
+          "abs_drop": 0.20764238581421657
+        },
+        "whitespace": {
+          "macro_f1": 0.6798074732273047,
+          "abs_drop": 0.20764238581421657
+        },
+        "swap": {
+          "macro_f1": 0.7638342263413221,
+          "abs_drop": 0.12361563270019915
+        }
+      }
+    },
+    "punctuation_OFF": {
+      "LR": {
+        "clean": 0.889256819266601,
+        "leetspeak": {
+          "macro_f1": 0.8613243516006753,
+          "abs_drop": 0.02793246766592572
+        },
+        "char_insert": {
+          "macro_f1": 0.6894702889831679,
+          "abs_drop": 0.19978653028343318
+        },
+        "whitespace": {
+          "macro_f1": 0.6899528922816387,
+          "abs_drop": 0.19930392698496235
+        },
+        "swap": {
+          "macro_f1": 0.7680207869285636,
+          "abs_drop": 0.12123603233803748
+        }
+      },
+      "NB": {
+        "clean": 0.852148187786806,
+        "leetspeak": {
+          "macro_f1": 0.822880155181424,
+          "abs_drop": 0.02926803260538202
+        },
+        "char_insert": {
+          "macro_f1": 0.6660516442697164,
+          "abs_drop": 0.1860965435170896
+        },
+        "whitespace": {
+          "macro_f1": 0.667376247366221,
+          "abs_drop": 0.18477194042058498
+        },
+        "swap": {
+          "macro_f1": 0.7496510302211727,
+          "abs_drop": 0.10249715756563327
+        }
+      },
+      "RF": {
+        "clean": 0.8860248443582264,
+        "leetspeak": {
+          "macro_f1": 0.8561442981468799,
+          "abs_drop": 0.029880546211346504
+        },
+        "char_insert": {
+          "macro_f1": 0.6800768851942015,
+          "abs_drop": 0.20594795916402486
+        },
+        "whitespace": {
+          "macro_f1": 0.6800768851942015,
+          "abs_drop": 0.20594795916402486
+        },
+        "swap": {
+          "macro_f1": 0.763342337522702,
+          "abs_drop": 0.1226825068355244
+        }
+      }
+    },
+    "both_OFF": {
+      "LR": {
+        "clean": 0.8893961006551938,
+        "leetspeak": {
+          "macro_f1": 0.7738761537148634,
+          "abs_drop": 0.11551994694033041
+        },
+        "char_insert": {
+          "macro_f1": 0.6868534529856892,
+          "abs_drop": 0.20254264766950458
+        },
+        "whitespace": {
+          "macro_f1": 0.6873415273330394,
+          "abs_drop": 0.20205457332215437
+        },
+        "swap": {
+          "macro_f1": 0.7666348807661654,
+          "abs_drop": 0.12276121988902844
+        }
+      },
+      "NB": {
+        "clean": 0.8533384355185043,
+        "leetspeak": {
+          "macro_f1": 0.7419059149416352,
+          "abs_drop": 0.11143252057686914
+        },
+        "char_insert": {
+          "macro_f1": 0.6656897237204348,
+          "abs_drop": 0.18764871179806952
+        },
+        "whitespace": {
+          "macro_f1": 0.6670201222643621,
+          "abs_drop": 0.18631831325414216
+        },
+        "swap": {
+          "macro_f1": 0.750069532693395,
+          "abs_drop": 0.10326890282510925
+        }
+      },
+      "RF": {
+        "clean": 0.8863192361202085,
+        "leetspeak": {
+          "macro_f1": 0.762784998108164,
+          "abs_drop": 0.12353423801204444
+        },
+        "char_insert": {
+          "macro_f1": 0.677914057174889,
+          "abs_drop": 0.2084051789453195
+        },
+        "whitespace": {
+          "macro_f1": 0.677914057174889,
+          "abs_drop": 0.2084051789453195
+        },
+        "swap": {
+          "macro_f1": 0.7625787597085374,
+          "abs_drop": 0.12374047641167107
+        }
+      }
+    }
+  },
+  "ablation_skipped": false,
+  "ablation_note": "Models trained with the full pipeline; only inference-time preprocessing is ablated.",
+  "audit_samples": {
+    "leetspeak": [
+      {
+        "id": 42195,
+        "raw": "FUK",
+        "perturbed": "FUK",
+        "vectorizer_input": "fuk",
+        "clean_vectorizer_input": "fuk",
+        "in_vocab_terms": [
+          "fuk"
+        ],
+        "in_vocab_terms_clean": [
+          "fuk"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 24145,
+        "raw": "retard ss [SEPA] reported",
+        "perturbed": "re74rd $s [SEPA] reported",
+        "vectorizer_input": "re7ard ss report",
+        "clean_vectorizer_input": "retard ss report",
+        "in_vocab_terms": [
+          "ss",
+          "report"
+        ],
+        "in_vocab_terms_clean": [
+          "retard",
+          "ss",
+          "report"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 9189,
+        "raw": "repot him [SEPA] report omni please",
+        "perturbed": "repot him [SEPA] report omni please",
+        "vectorizer_input": "repot report omni pleas",
+        "clean_vectorizer_input": "repot report omni pleas",
+        "in_vocab_terms": [
+          "report",
+          "omni",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "omni",
+          "pleas"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 42738,
+        "raw": "bara STUPID hoe",
+        "perturbed": "b4r4 $7UPID hoe",
+        "vectorizer_input": "bara s7upid hoe",
+        "clean_vectorizer_input": "bara stupid hoe",
+        "in_vocab_terms": [
+          "bara"
+        ],
+        "in_vocab_terms_clean": [
+          "bara",
+          "stupid"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 27177,
+        "raw": "Ez",
+        "perturbed": "Ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 12790,
+        "raw": "Report Luna thx .. AFK [SEPA] level 6 lol!",
+        "perturbed": "R3p0rt Luna 7hx .. AFK [SEPA] lev3l 6 lol!",
+        "vectorizer_input": "report luna 7hx afk level 6 lol",
+        "clean_vectorizer_input": "report luna thx afk level 6 lol",
+        "in_vocab_terms": [
+          "report",
+          "luna",
+          "afk",
+          "level",
+          "lol"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "luna",
+          "thx",
+          "afk",
+          "level",
+          "lol"
+        ],
+        "n_in_vocab": 5,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 983,
+        "raw": "wez [SEPA] ez ?",
+        "perturbed": "wez [SEPA] ez ?",
+        "vectorizer_input": "wez ez",
+        "clean_vectorizer_input": "wez ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 43994,
+        "raw": "team ezz",
+        "perturbed": "t34m ezz",
+        "vectorizer_input": "team ezz",
+        "clean_vectorizer_input": "team ezz",
+        "in_vocab_terms": [
+          "team",
+          "ezz"
+        ],
+        "in_vocab_terms_clean": [
+          "team",
+          "ezz"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 33495,
+        "raw": "comment undy",
+        "perturbed": "c0mm3n7 undy",
+        "vectorizer_input": "commen7 undi",
+        "clean_vectorizer_input": "comment undi",
+        "in_vocab_terms": [
+          "undi"
+        ],
+        "in_vocab_terms_clean": [
+          "comment",
+          "undi"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 4217,
+        "raw": "team feed",
+        "perturbed": "team feed",
+        "vectorizer_input": "team feed",
+        "clean_vectorizer_input": "team feed",
+        "in_vocab_terms": [
+          "team",
+          "feed"
+        ],
+        "in_vocab_terms_clean": [
+          "team",
+          "feed"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 39909,
+        "raw": "please report axe",
+        "perturbed": "please report ax3",
+        "vectorizer_input": "pleas report axe",
+        "clean_vectorizer_input": "pleas report axe",
+        "in_vocab_terms": [
+          "pleas",
+          "report",
+          "axe"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "axe"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 31477,
+        "raw": "ez",
+        "perturbed": "ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 326,
+        "raw": "LOL [SEPA] thanks guys [SEPA] so kind [SEPA] ez coins [SEPA] leave la  [SEPA] faster [SEPA] +250 coins +25 mmr [SEPA] thanks mang",
+        "perturbed": "LOL [SEPA] thanks guys [SEPA] so kind [SEPA] ez c01n$ [SEPA] l34v3 la [SEPA] f4s73r [SEPA] +250 c01ns +25 mmr [SEPA] thank$ mang",
+        "vectorizer_input": "lol thank guy kind ez coin leav la fas7er 25o coin 25 mmr thank mang",
+        "clean_vectorizer_input": "lol thank guy kind ez coin leav la faster 25o coin 25 mmr thank mang",
+        "in_vocab_terms": [
+          "lol",
+          "thank",
+          "guy",
+          "kind",
+          "ez",
+          "coin",
+          "leav",
+          "la",
+          "coin",
+          "25",
+          "mmr",
+          "thank"
+        ],
+        "in_vocab_terms_clean": [
+          "lol",
+          "thank",
+          "guy",
+          "kind",
+          "ez",
+          "coin",
+          "leav",
+          "la",
+          "faster",
+          "coin",
+          "25",
+          "mmr",
+          "thank"
+        ],
+        "n_in_vocab": 12,
+        "n_in_vocab_clean": 13
+      },
+      {
+        "id": 10836,
+        "raw": "noob qop",
+        "perturbed": "n00b qop",
+        "vectorizer_input": "noob qop",
+        "clean_vectorizer_input": "noob qop",
+        "in_vocab_terms": [
+          "noob",
+          "qop"
+        ],
+        "in_vocab_terms_clean": [
+          "noob",
+          "qop"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 29169,
+        "raw": "GG WP [SEPA] TNX [SEPA] <EPPI [SEPA] AHHAHAHAH [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY TEAM [SEPA] LAST PICK MEPPO [SEPA] 0-4",
+        "perturbed": "GG WP [SEPA] TNX [SEPA] <EPPI [SEPA] AHHAHAHAH [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY 734M [SEPA] L4$T PICK M3PPO [SEPA] 0-4",
+        "vectorizer_input": "gg wp tnx eppi ahhahahah 7eam last pick meppo",
+        "clean_vectorizer_input": "gg wp tnx eppi ahhahahah team last pick meppo",
+        "in_vocab_terms": [
+          "gg",
+          "wp",
+          "tnx",
+          "last",
+          "pick",
+          "meppo"
+        ],
+        "in_vocab_terms_clean": [
+          "gg",
+          "wp",
+          "tnx",
+          "team",
+          "last",
+          "pick",
+          "meppo"
+        ],
+        "n_in_vocab": 6,
+        "n_in_vocab_clean": 7
+      },
+      {
+        "id": 5579,
+        "raw": "NICE [SEPA] FUCK YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "perturbed": "NICE [SEPA] FUCK YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "vectorizer_input": "nice fuck yeah nice cumback cumback",
+        "clean_vectorizer_input": "nice fuck yeah nice cumback cumback",
+        "in_vocab_terms": [
+          "nice",
+          "fuck",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "in_vocab_terms_clean": [
+          "nice",
+          "fuck",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "n_in_vocab": 6,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 7696,
+        "raw": "pudsge is fun as shit when your drunk",
+        "perturbed": "pudsge is fun as $hi7 when your drunk",
+        "vectorizer_input": "pudsg fun shi7 drunk",
+        "clean_vectorizer_input": "pudsg fun shit drunk",
+        "in_vocab_terms": [
+          "fun",
+          "drunk"
+        ],
+        "in_vocab_terms_clean": [
+          "fun",
+          "shit",
+          "drunk"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 41549,
+        "raw": "viva la peru",
+        "perturbed": "viva la p3ru",
+        "vectorizer_input": "viva la peru",
+        "clean_vectorizer_input": "viva la peru",
+        "in_vocab_terms": [
+          "viva",
+          "la",
+          "peru"
+        ],
+        "in_vocab_terms_clean": [
+          "viva",
+          "la",
+          "peru"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 38257,
+        "raw": "please i coommend all  [SEPA] if u reported this fukking invoker  [SEPA] PLEASE",
+        "perturbed": "please i coommend all [SEPA] if u reported this fukking 1nvok3r [SEPA] PLEASE",
+        "vectorizer_input": "pleas coommend u report fuk invok pleas",
+        "clean_vectorizer_input": "pleas coommend u report fuk invok pleas",
+        "in_vocab_terms": [
+          "pleas",
+          "report",
+          "fuk",
+          "invok",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "fuk",
+          "invok",
+          "pleas"
+        ],
+        "n_in_vocab": 5,
+        "n_in_vocab_clean": 5
+      },
+      {
+        "id": 8093,
+        "raw": "bitch",
+        "perturbed": "bitch",
+        "vectorizer_input": "bitch",
+        "clean_vectorizer_input": "bitch",
+        "in_vocab_terms": [
+          "bitch"
+        ],
+        "in_vocab_terms_clean": [
+          "bitch"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      }
+    ],
+    "char_insert": [
+      {
+        "id": 42195,
+        "raw": "FUK",
+        "perturbed": "F~U.K",
+        "vectorizer_input": "f u k",
+        "clean_vectorizer_input": "fuk",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "fuk"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 24145,
+        "raw": "retard ss [SEPA] reported",
+        "perturbed": "r.e~t_a-r-d ss [SEPA] reported",
+        "vectorizer_input": "r e t_a r ss report",
+        "clean_vectorizer_input": "retard ss report",
+        "in_vocab_terms": [
+          "ss",
+          "report"
+        ],
+        "in_vocab_terms_clean": [
+          "retard",
+          "ss",
+          "report"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 9189,
+        "raw": "repot him [SEPA] report omni please",
+        "perturbed": "repot him [SEPA] report o-m~n.i please",
+        "vectorizer_input": "repot report n pleas",
+        "clean_vectorizer_input": "repot report omni pleas",
+        "in_vocab_terms": [
+          "report",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "omni",
+          "pleas"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 42738,
+        "raw": "bara STUPID hoe",
+        "perturbed": "b~a~r`a S.T`U*P.I.D hoe",
+        "vectorizer_input": "b r u p hoe",
+        "clean_vectorizer_input": "bara stupid hoe",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "bara",
+          "stupid"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 27177,
+        "raw": "Ez",
+        "perturbed": "Ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 12790,
+        "raw": "Report Luna thx .. AFK [SEPA] level 6 lol!",
+        "perturbed": "R.e-p-o`r`t L.u`n-a t~h~x .. A~F`K [SEPA] l*e-v*e`l 6 lol!",
+        "vectorizer_input": "r e p r l u n h x f k l e v e l 6 lol",
+        "clean_vectorizer_input": "report luna thx afk level 6 lol",
+        "in_vocab_terms": [
+          "lol"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "luna",
+          "thx",
+          "afk",
+          "level",
+          "lol"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 983,
+        "raw": "wez [SEPA] ez ?",
+        "perturbed": "w_e^z [SEPA] ez ?",
+        "vectorizer_input": "w_e z ez",
+        "clean_vectorizer_input": "wez ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 43994,
+        "raw": "team ezz",
+        "perturbed": "t^e.a^m e^z-z",
+        "vectorizer_input": "e e z z",
+        "clean_vectorizer_input": "team ezz",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "team",
+          "ezz"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 33495,
+        "raw": "comment undy",
+        "perturbed": "c~o*m_m_e-n-t u^n_d.y",
+        "vectorizer_input": "c m_m_e n u n_d",
+        "clean_vectorizer_input": "comment undi",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "comment",
+          "undi"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 4217,
+        "raw": "team feed",
+        "perturbed": "t.e*a.m f_e^e_d",
+        "vectorizer_input": "e f_e e_d",
+        "clean_vectorizer_input": "team feed",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "team",
+          "feed"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 39909,
+        "raw": "please report axe",
+        "perturbed": "please report a`x_e",
+        "vectorizer_input": "pleas report x_e",
+        "clean_vectorizer_input": "pleas report axe",
+        "in_vocab_terms": [
+          "pleas",
+          "report"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "axe"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 31477,
+        "raw": "ez",
+        "perturbed": "ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 326,
+        "raw": "LOL [SEPA] thanks guys [SEPA] so kind [SEPA] ez coins [SEPA] leave la  [SEPA] faster [SEPA] +250 coins +25 mmr [SEPA] thanks mang",
+        "perturbed": "L^O.L [SEPA] t~h*a`n.k*s g.u`y_s [SEPA] so k^i~n`d [SEPA] ez c^o_i`n-s [SEPA] l~e.a.v~e la [SEPA] f-a^s_t.e^r [SEPA] +250 c-o^i.n*s +25 m_m*r [SEPA] t~h^a_n-k_s m_a-n~g",
+        "vectorizer_input": "l l h n k g u y_ k n ez c o_i n l e v e la f s_t e r 25o c n 25 m_m r h a_n k_ m_a n g",
+        "clean_vectorizer_input": "lol thank guy kind ez coin leav la faster 25o coin 25 mmr thank mang",
+        "in_vocab_terms": [
+          "ez",
+          "la",
+          "25"
+        ],
+        "in_vocab_terms_clean": [
+          "lol",
+          "thank",
+          "guy",
+          "kind",
+          "ez",
+          "coin",
+          "leav",
+          "la",
+          "faster",
+          "coin",
+          "25",
+          "mmr",
+          "thank"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 13
+      },
+      {
+        "id": 10836,
+        "raw": "noob qop",
+        "perturbed": "n_o~o~b q~o.p",
+        "vectorizer_input": "n_o b q p",
+        "clean_vectorizer_input": "noob qop",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "noob",
+          "qop"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 29169,
+        "raw": "GG WP [SEPA] TNX [SEPA] <EPPI [SEPA] AHHAHAHAH [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY TEAM [SEPA] LAST PICK MEPPO [SEPA] 0-4",
+        "perturbed": "GG WP [SEPA] T`N~X [SEPA] <EPPI [SEPA] A-H`H~A-H-A*H*A_H [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY T~E~A`M [SEPA] L-A~S_T P^I^C^K M.E-P^P.O [SEPA] 0-4",
+        "vectorizer_input": "gg wp n x eppi h h h h a_h e l s_t p c k e p p",
+        "clean_vectorizer_input": "gg wp tnx eppi ahhahahah team last pick meppo",
+        "in_vocab_terms": [
+          "gg",
+          "wp"
+        ],
+        "in_vocab_terms_clean": [
+          "gg",
+          "wp",
+          "tnx",
+          "team",
+          "last",
+          "pick",
+          "meppo"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 7
+      },
+      {
+        "id": 5579,
+        "raw": "NICE [SEPA] FUCK YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "perturbed": "NICE [SEPA] F^U_C*K YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "vectorizer_input": "nice f u_c k yeah nice cumback cumback",
+        "clean_vectorizer_input": "nice fuck yeah nice cumback cumback",
+        "in_vocab_terms": [
+          "nice",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "in_vocab_terms_clean": [
+          "nice",
+          "fuck",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "n_in_vocab": 5,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 7696,
+        "raw": "pudsge is fun as shit when your drunk",
+        "perturbed": "pudsge is fun as s_h.i-t when your drunk",
+        "vectorizer_input": "pudsg fun s_h drunk",
+        "clean_vectorizer_input": "pudsg fun shit drunk",
+        "in_vocab_terms": [
+          "fun",
+          "drunk"
+        ],
+        "in_vocab_terms_clean": [
+          "fun",
+          "shit",
+          "drunk"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 41549,
+        "raw": "viva la peru",
+        "perturbed": "viva la p`e~r_u",
+        "vectorizer_input": "viva la p e r_u",
+        "clean_vectorizer_input": "viva la peru",
+        "in_vocab_terms": [
+          "viva",
+          "la"
+        ],
+        "in_vocab_terms_clean": [
+          "viva",
+          "la",
+          "peru"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 38257,
+        "raw": "please i coommend all  [SEPA] if u reported this fukking invoker  [SEPA] PLEASE",
+        "perturbed": "please i coommend all [SEPA] if u reported this fukking i-n~v*o*k~e*r [SEPA] PLEASE",
+        "vectorizer_input": "pleas coommend u report fuk n v k e r pleas",
+        "clean_vectorizer_input": "pleas coommend u report fuk invok pleas",
+        "in_vocab_terms": [
+          "pleas",
+          "report",
+          "fuk",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "fuk",
+          "invok",
+          "pleas"
+        ],
+        "n_in_vocab": 4,
+        "n_in_vocab_clean": 5
+      },
+      {
+        "id": 8093,
+        "raw": "bitch",
+        "perturbed": "b-i_t-c-h",
+        "vectorizer_input": "b i_t c h",
+        "clean_vectorizer_input": "bitch",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "bitch"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 1
+      }
+    ],
+    "whitespace": [
+      {
+        "id": 42195,
+        "raw": "FUK",
+        "perturbed": "F U K",
+        "vectorizer_input": "f u k",
+        "clean_vectorizer_input": "fuk",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "fuk"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 24145,
+        "raw": "retard ss [SEPA] reported",
+        "perturbed": "r e t a r d ss [SEPA] reported",
+        "vectorizer_input": "r e r ss report",
+        "clean_vectorizer_input": "retard ss report",
+        "in_vocab_terms": [
+          "ss",
+          "report"
+        ],
+        "in_vocab_terms_clean": [
+          "retard",
+          "ss",
+          "report"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 9189,
+        "raw": "repot him [SEPA] report omni please",
+        "perturbed": "repot him [SEPA] report o m n i please",
+        "vectorizer_input": "repot report n pleas",
+        "clean_vectorizer_input": "repot report omni pleas",
+        "in_vocab_terms": [
+          "report",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "omni",
+          "pleas"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 42738,
+        "raw": "bara STUPID hoe",
+        "perturbed": "b a r a S T U P I D hoe",
+        "vectorizer_input": "b r u p hoe",
+        "clean_vectorizer_input": "bara stupid hoe",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "bara",
+          "stupid"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 27177,
+        "raw": "Ez",
+        "perturbed": "Ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 12790,
+        "raw": "Report Luna thx .. AFK [SEPA] level 6 lol!",
+        "perturbed": "R e p o r t L u n a t h x .. A F K [SEPA] l e v e l 6 lol!",
+        "vectorizer_input": "r e p r l u n h x f k l e v e l 6 lol",
+        "clean_vectorizer_input": "report luna thx afk level 6 lol",
+        "in_vocab_terms": [
+          "lol"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "luna",
+          "thx",
+          "afk",
+          "level",
+          "lol"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 983,
+        "raw": "wez [SEPA] ez ?",
+        "perturbed": "w e z [SEPA] ez ?",
+        "vectorizer_input": "w e z ez",
+        "clean_vectorizer_input": "wez ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 43994,
+        "raw": "team ezz",
+        "perturbed": "t e a m e z z",
+        "vectorizer_input": "e e z z",
+        "clean_vectorizer_input": "team ezz",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "team",
+          "ezz"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 33495,
+        "raw": "comment undy",
+        "perturbed": "c o m m e n t u n d y",
+        "vectorizer_input": "c e n u n",
+        "clean_vectorizer_input": "comment undi",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "comment",
+          "undi"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 4217,
+        "raw": "team feed",
+        "perturbed": "t e a m f e e d",
+        "vectorizer_input": "e f e e",
+        "clean_vectorizer_input": "team feed",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "team",
+          "feed"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 39909,
+        "raw": "please report axe",
+        "perturbed": "please report a x e",
+        "vectorizer_input": "pleas report x e",
+        "clean_vectorizer_input": "pleas report axe",
+        "in_vocab_terms": [
+          "pleas",
+          "report"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "axe"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 31477,
+        "raw": "ez",
+        "perturbed": "ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 326,
+        "raw": "LOL [SEPA] thanks guys [SEPA] so kind [SEPA] ez coins [SEPA] leave la  [SEPA] faster [SEPA] +250 coins +25 mmr [SEPA] thanks mang",
+        "perturbed": "L O L [SEPA] t h a n k s g u y s [SEPA] so k i n d [SEPA] ez c o i n s [SEPA] l e a v e la [SEPA] f a s t e r [SEPA] +250 c o i n s +25 m m r [SEPA] t h a n k s m a n g",
+        "vectorizer_input": "l l h n k g u k n ez c n l e v e la f e r 25o c n 25 r h n k n g",
+        "clean_vectorizer_input": "lol thank guy kind ez coin leav la faster 25o coin 25 mmr thank mang",
+        "in_vocab_terms": [
+          "ez",
+          "la",
+          "25"
+        ],
+        "in_vocab_terms_clean": [
+          "lol",
+          "thank",
+          "guy",
+          "kind",
+          "ez",
+          "coin",
+          "leav",
+          "la",
+          "faster",
+          "coin",
+          "25",
+          "mmr",
+          "thank"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 13
+      },
+      {
+        "id": 10836,
+        "raw": "noob qop",
+        "perturbed": "n o o b q o p",
+        "vectorizer_input": "n b q p",
+        "clean_vectorizer_input": "noob qop",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "noob",
+          "qop"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 29169,
+        "raw": "GG WP [SEPA] TNX [SEPA] <EPPI [SEPA] AHHAHAHAH [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY TEAM [SEPA] LAST PICK MEPPO [SEPA] 0-4",
+        "perturbed": "GG WP [SEPA] T N X [SEPA] <EPPI [SEPA] A H H A H A H A H [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY T E A M [SEPA] L A S T P I C K M E P P O [SEPA] 0-4",
+        "vectorizer_input": "gg wp n x eppi h h h h h e l p c k e p p",
+        "clean_vectorizer_input": "gg wp tnx eppi ahhahahah team last pick meppo",
+        "in_vocab_terms": [
+          "gg",
+          "wp"
+        ],
+        "in_vocab_terms_clean": [
+          "gg",
+          "wp",
+          "tnx",
+          "team",
+          "last",
+          "pick",
+          "meppo"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 7
+      },
+      {
+        "id": 5579,
+        "raw": "NICE [SEPA] FUCK YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "perturbed": "NICE [SEPA] F U C K YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "vectorizer_input": "nice f u c k yeah nice cumback cumback",
+        "clean_vectorizer_input": "nice fuck yeah nice cumback cumback",
+        "in_vocab_terms": [
+          "nice",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "in_vocab_terms_clean": [
+          "nice",
+          "fuck",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "n_in_vocab": 5,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 7696,
+        "raw": "pudsge is fun as shit when your drunk",
+        "perturbed": "pudsge is fun as s h i t when your drunk",
+        "vectorizer_input": "pudsg fun h drunk",
+        "clean_vectorizer_input": "pudsg fun shit drunk",
+        "in_vocab_terms": [
+          "fun",
+          "drunk"
+        ],
+        "in_vocab_terms_clean": [
+          "fun",
+          "shit",
+          "drunk"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 41549,
+        "raw": "viva la peru",
+        "perturbed": "viva la p e r u",
+        "vectorizer_input": "viva la p e r u",
+        "clean_vectorizer_input": "viva la peru",
+        "in_vocab_terms": [
+          "viva",
+          "la"
+        ],
+        "in_vocab_terms_clean": [
+          "viva",
+          "la",
+          "peru"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 38257,
+        "raw": "please i coommend all  [SEPA] if u reported this fukking invoker  [SEPA] PLEASE",
+        "perturbed": "please i coommend all [SEPA] if u reported this fukking i n v o k e r [SEPA] PLEASE",
+        "vectorizer_input": "pleas coommend u report fuk n v k e r pleas",
+        "clean_vectorizer_input": "pleas coommend u report fuk invok pleas",
+        "in_vocab_terms": [
+          "pleas",
+          "report",
+          "fuk",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "fuk",
+          "invok",
+          "pleas"
+        ],
+        "n_in_vocab": 4,
+        "n_in_vocab_clean": 5
+      },
+      {
+        "id": 8093,
+        "raw": "bitch",
+        "perturbed": "b i t c h",
+        "vectorizer_input": "b c h",
+        "clean_vectorizer_input": "bitch",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "bitch"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 1
+      }
+    ],
+    "swap": [
+      {
+        "id": 42195,
+        "raw": "FUK",
+        "perturbed": "FUK",
+        "vectorizer_input": "fuk",
+        "clean_vectorizer_input": "fuk",
+        "in_vocab_terms": [
+          "fuk"
+        ],
+        "in_vocab_terms_clean": [
+          "fuk"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 24145,
+        "raw": "retard ss [SEPA] reported",
+        "perturbed": "retrad ss [SEPA] reported",
+        "vectorizer_input": "retrad ss report",
+        "clean_vectorizer_input": "retard ss report",
+        "in_vocab_terms": [
+          "ss",
+          "report"
+        ],
+        "in_vocab_terms_clean": [
+          "retard",
+          "ss",
+          "report"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 9189,
+        "raw": "repot him [SEPA] report omni please",
+        "perturbed": "repot him [SEPA] report onmi please",
+        "vectorizer_input": "repot report onmi pleas",
+        "clean_vectorizer_input": "repot report omni pleas",
+        "in_vocab_terms": [
+          "report",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "omni",
+          "pleas"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 42738,
+        "raw": "bara STUPID hoe",
+        "perturbed": "braa SUTPID hoe",
+        "vectorizer_input": "braa sutpid hoe",
+        "clean_vectorizer_input": "bara stupid hoe",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "bara",
+          "stupid"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 27177,
+        "raw": "Ez",
+        "perturbed": "Ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 12790,
+        "raw": "Report Luna thx .. AFK [SEPA] level 6 lol!",
+        "perturbed": "Rpeort Lnua thx .. AFK [SEPA] leevl 6 lol!",
+        "vectorizer_input": "rpeort lnua thx afk leevl 6 lol",
+        "clean_vectorizer_input": "report luna thx afk level 6 lol",
+        "in_vocab_terms": [
+          "rpeort",
+          "thx",
+          "afk",
+          "lol"
+        ],
+        "in_vocab_terms_clean": [
+          "report",
+          "luna",
+          "thx",
+          "afk",
+          "level",
+          "lol"
+        ],
+        "n_in_vocab": 4,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 983,
+        "raw": "wez [SEPA] ez ?",
+        "perturbed": "wez [SEPA] ez ?",
+        "vectorizer_input": "wez ez",
+        "clean_vectorizer_input": "wez ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 43994,
+        "raw": "team ezz",
+        "perturbed": "taem ezz",
+        "vectorizer_input": "taem ezz",
+        "clean_vectorizer_input": "team ezz",
+        "in_vocab_terms": [
+          "ezz"
+        ],
+        "in_vocab_terms_clean": [
+          "team",
+          "ezz"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 33495,
+        "raw": "comment undy",
+        "perturbed": "comment udny",
+        "vectorizer_input": "comment udni",
+        "clean_vectorizer_input": "comment undi",
+        "in_vocab_terms": [
+          "comment"
+        ],
+        "in_vocab_terms_clean": [
+          "comment",
+          "undi"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 4217,
+        "raw": "team feed",
+        "perturbed": "taem feed",
+        "vectorizer_input": "taem feed",
+        "clean_vectorizer_input": "team feed",
+        "in_vocab_terms": [
+          "feed"
+        ],
+        "in_vocab_terms_clean": [
+          "team",
+          "feed"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 39909,
+        "raw": "please report axe",
+        "perturbed": "please report axe",
+        "vectorizer_input": "pleas report axe",
+        "clean_vectorizer_input": "pleas report axe",
+        "in_vocab_terms": [
+          "pleas",
+          "report",
+          "axe"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "axe"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 31477,
+        "raw": "ez",
+        "perturbed": "ez",
+        "vectorizer_input": "ez",
+        "clean_vectorizer_input": "ez",
+        "in_vocab_terms": [
+          "ez"
+        ],
+        "in_vocab_terms_clean": [
+          "ez"
+        ],
+        "n_in_vocab": 1,
+        "n_in_vocab_clean": 1
+      },
+      {
+        "id": 326,
+        "raw": "LOL [SEPA] thanks guys [SEPA] so kind [SEPA] ez coins [SEPA] leave la  [SEPA] faster [SEPA] +250 coins +25 mmr [SEPA] thanks mang",
+        "perturbed": "LOL [SEPA] tahnks gyus [SEPA] so knid [SEPA] ez cions [SEPA] laeve la [SEPA] fasetr [SEPA] +250 cions +25 mmr [SEPA] thakns mnag",
+        "vectorizer_input": "lol tahnk gyu knid ez cion laev la fasetr 25o cion 25 mmr thakn mnag",
+        "clean_vectorizer_input": "lol thank guy kind ez coin leav la faster 25o coin 25 mmr thank mang",
+        "in_vocab_terms": [
+          "lol",
+          "gyu",
+          "ez",
+          "la",
+          "25",
+          "mmr"
+        ],
+        "in_vocab_terms_clean": [
+          "lol",
+          "thank",
+          "guy",
+          "kind",
+          "ez",
+          "coin",
+          "leav",
+          "la",
+          "faster",
+          "coin",
+          "25",
+          "mmr",
+          "thank"
+        ],
+        "n_in_vocab": 6,
+        "n_in_vocab_clean": 13
+      },
+      {
+        "id": 10836,
+        "raw": "noob qop",
+        "perturbed": "noob qop",
+        "vectorizer_input": "noob qop",
+        "clean_vectorizer_input": "noob qop",
+        "in_vocab_terms": [
+          "noob",
+          "qop"
+        ],
+        "in_vocab_terms_clean": [
+          "noob",
+          "qop"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 2
+      },
+      {
+        "id": 29169,
+        "raw": "GG WP [SEPA] TNX [SEPA] <EPPI [SEPA] AHHAHAHAH [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY TEAM [SEPA] LAST PICK MEPPO [SEPA] 0-4",
+        "perturbed": "GG WP [SEPA] TNX [SEPA] <EPPI [SEPA] AHHAAHHAH [SEPA] 0-4 [SEPA] WHY [SEPA] IN MY TAEM [SEPA] LSAT PCIK MPEPO [SEPA] 0-4",
+        "vectorizer_input": "gg wp tnx eppi ahhaahhah taem lsat pcik mpepo",
+        "clean_vectorizer_input": "gg wp tnx eppi ahhahahah team last pick meppo",
+        "in_vocab_terms": [
+          "gg",
+          "wp",
+          "tnx"
+        ],
+        "in_vocab_terms_clean": [
+          "gg",
+          "wp",
+          "tnx",
+          "team",
+          "last",
+          "pick",
+          "meppo"
+        ],
+        "n_in_vocab": 3,
+        "n_in_vocab_clean": 7
+      },
+      {
+        "id": 5579,
+        "raw": "NICE [SEPA] FUCK YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "perturbed": "NICE [SEPA] FCUK YEAH [SEPA] NICE [SEPA] CUMBACK CUMBACK",
+        "vectorizer_input": "nice fcuk yeah nice cumback cumback",
+        "clean_vectorizer_input": "nice fuck yeah nice cumback cumback",
+        "in_vocab_terms": [
+          "nice",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "in_vocab_terms_clean": [
+          "nice",
+          "fuck",
+          "yeah",
+          "nice",
+          "cumback",
+          "cumback"
+        ],
+        "n_in_vocab": 5,
+        "n_in_vocab_clean": 6
+      },
+      {
+        "id": 7696,
+        "raw": "pudsge is fun as shit when your drunk",
+        "perturbed": "pudsge is fun as siht when your drunk",
+        "vectorizer_input": "pudsg fun siht drunk",
+        "clean_vectorizer_input": "pudsg fun shit drunk",
+        "in_vocab_terms": [
+          "fun",
+          "drunk"
+        ],
+        "in_vocab_terms_clean": [
+          "fun",
+          "shit",
+          "drunk"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 41549,
+        "raw": "viva la peru",
+        "perturbed": "viva la preu",
+        "vectorizer_input": "viva la preu",
+        "clean_vectorizer_input": "viva la peru",
+        "in_vocab_terms": [
+          "viva",
+          "la"
+        ],
+        "in_vocab_terms_clean": [
+          "viva",
+          "la",
+          "peru"
+        ],
+        "n_in_vocab": 2,
+        "n_in_vocab_clean": 3
+      },
+      {
+        "id": 38257,
+        "raw": "please i coommend all  [SEPA] if u reported this fukking invoker  [SEPA] PLEASE",
+        "perturbed": "please i coommend all [SEPA] if u reported this fukking ivnoker [SEPA] PLEASE",
+        "vectorizer_input": "pleas coommend u report fuk ivnok pleas",
+        "clean_vectorizer_input": "pleas coommend u report fuk invok pleas",
+        "in_vocab_terms": [
+          "pleas",
+          "report",
+          "fuk",
+          "pleas"
+        ],
+        "in_vocab_terms_clean": [
+          "pleas",
+          "report",
+          "fuk",
+          "invok",
+          "pleas"
+        ],
+        "n_in_vocab": 4,
+        "n_in_vocab_clean": 5
+      },
+      {
+        "id": 8093,
+        "raw": "bitch",
+        "perturbed": "btich",
+        "vectorizer_input": "btich",
+        "clean_vectorizer_input": "bitch",
+        "in_vocab_terms": [],
+        "in_vocab_terms_clean": [
+          "bitch"
+        ],
+        "n_in_vocab": 0,
+        "n_in_vocab_clean": 1
+      }
+    ]
+  },
+  "n_audit_per_attack": 20
+}

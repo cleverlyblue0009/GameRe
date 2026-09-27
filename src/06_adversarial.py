@@ -96,7 +96,10 @@ def atk_leetspeak(utterance, slots, rng):
             out.append(tok)
             continue
         out.append("".join(
-            LEET_ATTACK[ch] if (ch.lower() in LEET_ATTACK and rng.random() < LEET_P)
+            # index with the lowered char: membership was tested on ch.lower(),
+            # and the leet substitutes (4/3/1/0/$/7) are caseless anyway
+            LEET_ATTACK[ch.lower()]
+            if (ch.lower() in LEET_ATTACK and rng.random() < LEET_P)
             else ch
             for ch in tok
         ))
