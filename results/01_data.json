@@ -1,0 +1,164 @@
+{
+  "target_counts": {
+    "toxic": 2345,
+    "non_toxic": 6628
+  },
+  "adopted_mapping": "intentClass in {E,A,I}",
+  "adopted_mapping_rule": "toxic = 1 if intentClass != 'O' else 0",
+  "sensitivity_mapping_rule": "toxic = 1 if intentClass in {E,I} else 0",
+  "candidates": [
+    {
+      "mapping": "intentClass in {E}",
+      "toxic": 1183,
+      "non_toxic": 7790,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass in {A}",
+      "toxic": 580,
+      "non_toxic": 8393,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass in {I}",
+      "toxic": 582,
+      "non_toxic": 8391,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass in {E,A}",
+      "toxic": 1763,
+      "non_toxic": 7210,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass in {E,I}",
+      "toxic": 1765,
+      "non_toxic": 7208,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass in {A,I}",
+      "toxic": 1162,
+      "non_toxic": 7811,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass in {E,A,I}",
+      "toxic": 2345,
+      "non_toxic": 6628,
+      "total": 8973,
+      "matches_target": true
+    },
+    {
+      "mapping": "token-level: slotClasses has T",
+      "toxic": 1249,
+      "non_toxic": 7724,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "token-level: slotClasses has T|C",
+      "toxic": 2406,
+      "non_toxic": 6567,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "token-level: slotClasses has T|D",
+      "toxic": 1539,
+      "non_toxic": 7434,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "token-level: slotClasses has T|D|S",
+      "toxic": 3846,
+      "non_toxic": 5127,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass != O  OR  slot has T",
+      "toxic": 2589,
+      "non_toxic": 6384,
+      "total": 8973,
+      "matches_target": false
+    },
+    {
+      "mapping": "intentClass != O  AND  slot has T",
+      "toxic": 1005,
+      "non_toxic": 7968,
+      "total": 8973,
+      "matches_target": false
+    }
+  ],
+  "dropped_blank_utterances": {
+    "train": 7,
+    "test": 1
+  },
+  "rows_raw": {
+    "CONDA_train.csv": 26921,
+    "CONDA_valid.csv": 8974,
+    "CONDA_test.csv": 8974
+  },
+  "splits": [
+    {
+      "split": "train",
+      "n": 21531,
+      "toxic": 5551,
+      "non_toxic": 15980,
+      "toxic_pct": 25.78,
+      "toxic_EI": 4165,
+      "toxic_EI_pct": 19.34,
+      "intent_counts": {
+        "O": 15980,
+        "E": 2812,
+        "A": 1386,
+        "I": 1353
+      }
+    },
+    {
+      "split": "val",
+      "n": 5383,
+      "toxic": 1388,
+      "non_toxic": 3995,
+      "toxic_pct": 25.78,
+      "toxic_EI": 1055,
+      "toxic_EI_pct": 19.6,
+      "intent_counts": {
+        "O": 3995,
+        "E": 716,
+        "I": 339,
+        "A": 333
+      }
+    },
+    {
+      "split": "test",
+      "n": 8973,
+      "toxic": 2345,
+      "non_toxic": 6628,
+      "toxic_pct": 26.13,
+      "toxic_EI": 1765,
+      "toxic_EI_pct": 19.67,
+      "intent_counts": {
+        "O": 6628,
+        "E": 1183,
+        "I": 582,
+        "A": 580
+      }
+    }
+  ],
+  "split_config": {
+    "test_size": 0.2,
+    "seed": 42,
+    "stratify": "label",
+    "source": "CONDA_train.csv"
+  }
+}

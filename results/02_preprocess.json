@@ -1,0 +1,73 @@
+{
+  "classical_order": [
+    "lowercase",
+    "strip_urls_mentions ([SEPA], @mentions, URLs)",
+    "leetspeak (3->e 0->o 4->a 1->i @->a $->s)",
+    "strip_punctuation (REPLACED BY SPACE; apostrophes kept inside words only)",
+    "remove_stopwords (NLTK english minus gaming whitelist)",
+    "porter_stem"
+  ],
+  "punctuation_policy": "replaced_by_space",
+  "punctuation_policy_note": "Punctuation is replaced by a space rather than deleted. This avoids welding words together, but means the character-insertion attack is NOT repaired by preprocessing ('f.u.c.k' -> 'f u c k'). Deleting punctuation would accidentally defend against that attack; see the script 06 ablation.",
+  "bert_pipeline": [
+    "lowercase",
+    "strip_urls_mentions"
+  ],
+  "leet_map": {
+    "3": "e",
+    "0": "o",
+    "4": "a",
+    "1": "i",
+    "@": "a",
+    "$": "s"
+  },
+  "stopwords": {
+    "nltk_total": 198,
+    "whitelist": [
+      "buff",
+      "ez",
+      "gg",
+      "gl",
+      "glhf",
+      "hf",
+      "nerf",
+      "noob",
+      "op",
+      "wp"
+    ],
+    "whitelist_actually_in_nltk": [],
+    "effective_count": 198
+  },
+  "splits": [
+    {
+      "split": "train",
+      "n": 21531,
+      "empty_after_classical": 1240,
+      "empty_pct": 5.759,
+      "mean_tokens_classical": 2.4,
+      "median_tokens_classical": 2,
+      "max_tokens_classical": 35,
+      "vocab_size_classical": 6885
+    },
+    {
+      "split": "val",
+      "n": 5383,
+      "empty_after_classical": 290,
+      "empty_pct": 5.387,
+      "mean_tokens_classical": 2.42,
+      "median_tokens_classical": 2,
+      "max_tokens_classical": 24,
+      "vocab_size_classical": 3008
+    },
+    {
+      "split": "test",
+      "n": 8973,
+      "empty_after_classical": 482,
+      "empty_pct": 5.372,
+      "mean_tokens_classical": 2.42,
+      "median_tokens_classical": 2,
+      "max_tokens_classical": 55,
+      "vocab_size_classical": 4032
+    }
+  ]
+}
