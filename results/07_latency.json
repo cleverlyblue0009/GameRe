@@ -1,0 +1,233 @@
+{
+  "label_set": "primary",
+  "protocol": {
+    "n_warmup": 100,
+    "n_timed": 1000,
+    "batch_size": 32,
+    "clock": "time.perf_counter",
+    "primary_metric": "end_to_end",
+    "primary_metric_note": "end-to-end = raw string -> preprocessing -> vectoriser/tokeniser -> predict. model_only excludes preprocessing and vectorisation/tokenisation."
+  },
+  "cpu_classical": {
+    "LR": {
+      "end_to_end_single": {
+        "mean_ms": 0.8932037002232391,
+        "std_ms": 0.46097838713383293,
+        "p50_ms": 0.7548500143457204,
+        "p95_ms": 1.4718849983182731,
+        "p99_ms": 2.6893240152276117,
+        "min_ms": 0.5635000125039369,
+        "max_ms": 6.300400011241436,
+        "n": 1000
+      },
+      "model_only_single": {
+        "mean_ms": 0.17467639964888804,
+        "std_ms": 0.06384043745068854,
+        "p50_ms": 0.14365000242833048,
+        "p95_ms": 0.30843499116599554,
+        "p99_ms": 0.40545497322455043,
+        "min_ms": 0.1320999872405082,
+        "max_ms": 0.5887000006623566,
+        "n": 1000
+      },
+      "end_to_end_batch": {
+        "batch_size": 32,
+        "mean_batch_ms": 2.802579001581762,
+        "p95_batch_ms": 3.751340015151072,
+        "amortised_ms_per_example": 0.08758059379943006,
+        "throughput_examples_per_s": 11418.054578279276,
+        "n_batches": 100
+      }
+    },
+    "NB": {
+      "end_to_end_single": {
+        "mean_ms": 0.9529094001336489,
+        "std_ms": 0.30717008538482393,
+        "p50_ms": 0.8356500038644299,
+        "p95_ms": 1.539249990310054,
+        "p99_ms": 2.0144170010462403,
+        "min_ms": 0.662600010400638,
+        "max_ms": 3.35139999515377,
+        "n": 1000
+      },
+      "model_only_single": {
+        "mean_ms": 0.2753668997902423,
+        "std_ms": 0.12478613605967914,
+        "p50_ms": 0.22375000116880983,
+        "p95_ms": 0.5060250114183873,
+        "p99_ms": 0.8006330055650315,
+        "min_ms": 0.20340000628493726,
+        "max_ms": 1.3905999949201941,
+        "n": 1000
+      },
+      "end_to_end_batch": {
+        "batch_size": 32,
+        "mean_batch_ms": 2.894915000651963,
+        "p95_batch_ms": 4.1467400136752985,
+        "amortised_ms_per_example": 0.09046609377037385,
+        "throughput_examples_per_s": 11053.86513690153,
+        "n_batches": 100
+      }
+    },
+    "RF": {
+      "n_jobs=1": {
+        "end_to_end_single": {
+          "mean_ms": 19.959975099307485,
+          "std_ms": 4.363371220010492,
+          "p50_ms": 18.92224999028258,
+          "p95_ms": 26.55121999996481,
+          "p99_ms": 34.658914015744806,
+          "min_ms": 15.655600000172853,
+          "max_ms": 91.02789999451488,
+          "n": 1000
+        },
+        "model_only_single": {
+          "mean_ms": 18.43506849996629,
+          "std_ms": 2.5527365186577553,
+          "p50_ms": 17.76520001294557,
+          "p95_ms": 23.485334975703154,
+          "p99_ms": 27.76187498064246,
+          "min_ms": 15.073300019139424,
+          "max_ms": 39.42439999082126,
+          "n": 1000
+        },
+        "end_to_end_batch": {
+          "batch_size": 32,
+          "mean_batch_ms": 50.541614000103436,
+          "p95_batch_ms": 65.71801501995651,
+          "amortised_ms_per_example": 1.5794254375032324,
+          "throughput_examples_per_s": 633.1416325551952,
+          "n_batches": 100
+        },
+        "n_jobs": 1
+      },
+      "n_jobs=-1": {
+        "end_to_end_single": {
+          "mean_ms": 50.36739689990645,
+          "std_ms": 7.006213969161421,
+          "p50_ms": 48.73189999489114,
+          "p95_ms": 57.98272000829456,
+          "p99_ms": 68.14587800559819,
+          "min_ms": 41.338900016853586,
+          "max_ms": 157.04759999061935,
+          "n": 1000
+        },
+        "model_only_single": {
+          "mean_ms": 55.61508450037218,
+          "std_ms": 7.586830705582503,
+          "p50_ms": 55.38810000871308,
+          "p95_ms": 65.70343500789022,
+          "p99_ms": 74.26774300169197,
+          "min_ms": 35.522400023182854,
+          "max_ms": 160.85849999217317,
+          "n": 1000
+        },
+        "end_to_end_batch": {
+          "batch_size": 32,
+          "mean_batch_ms": 65.77414000028512,
+          "p95_batch_ms": 72.14797501510475,
+          "amortised_ms_per_example": 2.05544187500891,
+          "throughput_examples_per_s": 486.5133926473427,
+          "n_batches": 100
+        },
+        "n_jobs": -1
+      }
+    }
+  },
+  "cpu_distilbert": {
+    "torch_num_threads": 6,
+    "torch_num_interop_threads": 6,
+    "end_to_end_single": {
+      "mean_ms": 19.414977900334634,
+      "std_ms": 3.5593711886323742,
+      "p50_ms": 19.06994999444578,
+      "p95_ms": 24.299449984391686,
+      "p99_ms": 29.25394498684908,
+      "min_ms": 13.6116000066977,
+      "max_ms": 67.89140001637861,
+      "n": 1000
+    },
+    "model_only_single": {
+      "mean_ms": 19.004987999680452,
+      "std_ms": 3.795120147107762,
+      "p50_ms": 18.630999999004416,
+      "p95_ms": 24.51214500906644,
+      "p99_ms": 29.158527987601698,
+      "min_ms": 12.303900002734736,
+      "max_ms": 65.88899999042042,
+      "n": 1000
+    },
+    "end_to_end_batch": {
+      "batch_size": 32,
+      "mean_batch_ms": 337.46818099869415,
+      "p95_batch_ms": 1069.910930005426,
+      "amortised_ms_per_example": 10.545880656209192,
+      "throughput_examples_per_s": 94.82375465829126,
+      "n_batches": 100
+    }
+  },
+  "gpu_distilbert": {
+    "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "fp32": {
+      "end_to_end_single": {
+        "mean_ms": 6.674341899779392,
+        "std_ms": 0.96994548628465,
+        "p50_ms": 6.4470000070286915,
+        "p95_ms": 8.45000501431059,
+        "p99_ms": 10.041351002000738,
+        "min_ms": 5.149499978870153,
+        "max_ms": 13.648699998157099,
+        "n": 1000
+      },
+      "model_only_single": {
+        "mean_ms": 5.760117700061528,
+        "std_ms": 1.1602997581112275,
+        "p50_ms": 5.379999987781048,
+        "p95_ms": 7.737879992055238,
+        "p99_ms": 9.616120017890351,
+        "min_ms": 4.424399987328798,
+        "max_ms": 18.485100008547306,
+        "n": 1000
+      },
+      "end_to_end_batch": {
+        "batch_size": 32,
+        "mean_batch_ms": 16.04551199969137,
+        "p95_batch_ms": 44.737259998510126,
+        "amortised_ms_per_example": 0.5014222499903553,
+        "throughput_examples_per_s": 1994.3271364986988,
+        "n_batches": 100
+      }
+    },
+    "fp16_autocast": {
+      "end_to_end_single": {
+        "mean_ms": 9.448227599728853,
+        "std_ms": 1.4013872044227693,
+        "p50_ms": 9.139050001977012,
+        "p95_ms": 12.034690014843363,
+        "p99_ms": 13.696443016233381,
+        "min_ms": 7.5280000164639205,
+        "max_ms": 24.22719998867251,
+        "n": 1000
+      },
+      "model_only_single": {
+        "mean_ms": 9.012829700513976,
+        "std_ms": 1.9527176667841541,
+        "p50_ms": 8.40885000070557,
+        "p95_ms": 12.89991499361349,
+        "p99_ms": 15.972269022895489,
+        "min_ms": 6.761500000720844,
+        "max_ms": 19.554499973310158,
+        "n": 1000
+      },
+      "end_to_end_batch": {
+        "batch_size": 32,
+        "mean_batch_ms": 12.808210998482537,
+        "p95_batch_ms": 19.359944981988516,
+        "amortised_ms_per_example": 0.40025659370257927,
+        "throughput_examples_per_s": 2498.3973174545004,
+        "n_batches": 100
+      }
+    },
+    "sync_note": "torch.cuda.synchronize() called before stopping every timer; eval mode + torch.inference_mode()"
+  }
+}
